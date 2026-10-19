@@ -94,9 +94,9 @@
                     </div>
                     <div class="flex items-center space-x-1 text-xs">
                         <span class="text-slate-400 mr-1">Filtre :</span>
-                        <button onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">Tous</button>
-                        <button onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
-                        <button onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
+                        <button type="button" onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">Tous</button>
+                        <button type="button" onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
+                        <button type="button" onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
                     </div>
                 </div>
                 
@@ -150,7 +150,7 @@
             <section class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
                 <div class="p-4 bg-slate-50 font-semibold text-slate-700 border-b border-slate-200 flex justify-between items-center">
                     <span>Historique des mouvements</span>
-                    <button onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow-xs">Export ChatGPT</button>
+                    <button type="button" onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow-xs">Export ChatGPT</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -181,59 +181,77 @@
 
         async function loadData() {
             const statusEl = document.getElementById('sync-status');
-            statusEl.textContent = "Chargement...";
+            if (statusEl) statusEl.textContent = "Chargement...";
             try {
                 const response = await fetch(API_URL + "?action=load_all");
                 const result = await response.json();
                 if (result.status === "success") {
                     appData = result.data;
                     renderPlanificateur();
-                    statusEl.textContent = "À jour";
-                    statusEl.className = "text-xs bg-emerald-600 px-3 py-1 rounded-full text-emerald-100";
+                    if (statusEl) {
+                        statusEl.textContent = "À jour";
+                        statusEl.className = "text-xs bg-emerald-600 px-3 py-1 rounded-full text-emerald-100";
+                    }
                 } else {
                     throw new Error(result.message);
                 }
             } catch (error) {
                 console.error(error);
-                statusEl.textContent = "Erreur de synchro";
-                statusEl.className = "text-xs bg-rose-600 px-3 py-1 rounded-full text-rose-100";
+                if (statusEl) {
+                    statusEl.textContent = "Erreur de synchro";
+                    statusEl.className = "text-xs bg-rose-600 px-3 py-1 rounded-full text-rose-100";
+                }
             }
         }
 
         function switchView(viewName) {
-            document.getElementById('view-planificateur').classList.add('hidden');
-            document.getElementById('view-mouvements').classList.add('hidden');
-            document.getElementById('btn-view-planificateur').className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
-            document.getElementById('btn-view-mouvements').className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+            const planifEl = document.getElementById('view-planificateur');
+            const mvtEl = document.getElementById('view-mouvements');
+            const btnPlanif = document.getElementById('btn-view-planificateur');
+            const btnMvt = document.getElementById('btn-view-mouvements');
 
-            document.getElementById('view-' + viewName).classList.remove('hidden');
-            document.getElementById('btn-view-' + viewName).className = "flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs";
+            if (planifEl) planifEl.classList.add('hidden');
+            if (mvtEl) mvtEl.classList.add('hidden');
+            if (btnPlanif) btnPlanif.className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+            if (btnMvt) btnMvt.className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+
+            const targetView = document.getElementById('view-' + viewName);
+            const targetBtn = document.getElementById('btn-view-' + viewName);
+
+            if (targetView) targetView.classList.remove('hidden');
+            if (targetBtn) targetBtn.className = "flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs";
         }
 
         function setFilter(filterType) {
             currentFilter = filterType;
-            ['ALL', 'TODO', 'DONE'].forEach(f => {
+            const filters = ['ALL', 'TODO', 'DONE'];
+            filters.forEach(function(f) {
                 const btn = document.getElementById('filter-btn-' + f);
-                if (btn) btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
+                if (btn) {
+                    btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
+                }
             });
             const activeBtn = document.getElementById('filter-btn-' + filterType);
-            if (activeBtn) activeBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
+            if (activeBtn) {
+                activeBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
+            }
             renderPlanificateur();
         }
 
         function renderPlanificateur() {
             const container = document.getElementById('barres-enveloppes-container');
+            if (!container) return;
             container.innerHTML = "";
 
             if (appData.enveloppes && appData.evenements) {
-                appData.enveloppes.forEach(env => {
+                appData.enveloppes.forEach(function(env) {
                     let eventsAssocies = [];
                     let totalCible = env.budget_annuel || env.budget_annuel_brut || 770;
                     if (env.enveloppe_id === 'precaution') totalCible = 2400;
 
                     let totalConsomme = 0;
 
-                    appData.evenements.forEach(evt => {
+                    appData.evenements.forEach(function(evt) {
                         let isMatch = false;
                         if (env.enveloppe_id === 'anniversaires' && (evt.evenement_id.startsWith('anniv_') || evt.type_evenement === 'ANNIVERSAIRE')) isMatch = true;
                         if (env.enveloppe_id === 'noel' && (evt.evenement_id.startsWith('noel_') || evt.type_evenement === 'NOEL')) isMatch = true;
@@ -263,10 +281,9 @@
                         statusBadgeClass = "bg-rose-50 text-rose-700";
                     }
 
-                    // Construction sécurisée du HTML des sous-éléments sans backticks imbriqués
                     let listItemsHTML = "";
                     if (eventsAssocies.length > 0) {
-                        eventsAssocies.forEach(evt => {
+                        eventsAssocies.forEach(function(evt) {
                             let badgeClass = evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
                             let badgeText = evt.statut === 'ACHETE' ? '✓ Acheté' : 'À provisionner';
                             let montantDep = evt.montant_depense || 0;
@@ -317,25 +334,26 @@
             renderCadeauxCheckboxes();
 
             const mvtTbody = document.getElementById('mouvements-tbody');
-            mvtTbody.innerHTML = "";
-            if (appData.mouvements && appData.mouvements.length > 0) {
-                appData.mouvements.forEach(mvt => {
-                    mvtTbody.innerHTML += `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="p-3 text-slate-500 text-xs">${mvt.date}</td>
-                            <td class="p-3 font-medium text-slate-700 text-xs">${mvt.type}</td>
-                            <td class="p-3 font-bold ${mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800'} text-xs">${mvt.montant} €</td>
-                            <td class="p-3 text-slate-600 text-xs">${mvt.commentaire || ''}</td>
-                            <td class="p-3 text-right">
-                                <button onclick="deleteMouvement('${mvt.mouvement_id}')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } else {
-                mvtTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement enregistré.</td></tr>`;
+            if (mvtTbody) {
+                mvtTbody.innerHTML = "";
+                if (appData.mouvements && appData.mouvements.length > 0) {
+                    appData.mouvements.forEach(function(mvt) {
+                        let montantClass = mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800';
+                        mvtTbody.innerHTML += '<tr class="border-b border-slate-100 hover:bg-slate-50">' +
+                            '<td class="p-3 text-slate-500 text-xs">' + mvt.date + '</td>' +
+                            '<td class="p-3 font-medium text-slate-700 text-xs">' + mvt.type + '</td>' +
+                            '<td class="p-3 font-bold ' + montantClass + ' text-xs">' + mvt.montant + ' €</td>' +
+                            '<td class="p-3 text-slate-600 text-xs">' + (mvt.commentaire || '') + '</td>' +
+                            '<td class="p-3 text-right">' +
+                                '<button type="button" onclick="deleteMouvement(\'' + mvt.mouvement_id + '\')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer">' +
+                                    '<i class="fa-solid fa-trash"></i>' +
+                                '</button>' +
+                            '</td>' +
+                        '</tr>';
+                    });
+                } else {
+                    mvtTbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement enregistré.</td></tr>';
+                }
             }
         }
 
@@ -368,41 +386,48 @@
 
         function renderCadeauxCheckboxes() {
             const cbContainer = document.getElementById('checkboxes-evenements');
+            if (!cbContainer) return;
             cbContainer.innerHTML = '';
             if (appData.evenements) {
-                appData.evenements.forEach(evt => {
-                    cbContainer.innerHTML += `
-                        <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">
-                            <input type="checkbox" name="selected_events" value="${evt.evenement_id}" class="rounded text-indigo-600">
-                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.prochaine_date || 'Date non fixée'} - ${evt.budget_cible}€)</span></span>
-                        </label>
-                    `;
+                appData.evenements.forEach(function(evt) {
+                    cbContainer.innerHTML += '<label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">' +
+                        '<input type="checkbox" name="selected_events" value="' + evt.evenement_id + '" class="rounded text-indigo-600">' +
+                        '<span class="truncate"><b>' + evt.libelle + '</b> <span class="text-slate-400">(' + (evt.prochaine_date || 'Date non fixée') + ' - ' + evt.budget_cible + '€)</span></span>' +
+                    '</label>';
                 });
             }
         }
 
         function handleTypeChange() {
-            const type = document.getElementById('mvt-type').value;
+            const typeSel = document.getElementById('mvt-type');
             const container = document.getElementById('cadeau-selection-container');
-            if (type === 'CADEAU_ACHETE') container.classList.remove('hidden');
-            else container.classList.add('hidden');
+            if (typeSel && container) {
+                if (typeSel.value === 'CADEAU_ACHETE') container.classList.remove('hidden');
+                else container.classList.add('hidden');
+            }
         }
 
         async function submitMouvement(event) {
             event.preventDefault();
             let selectedEvents = [];
-            const type = document.getElementById('mvt-type').value;
+            const typeSel = document.getElementById('mvt-type');
+            const type = typeSel ? typeSel.value : '';
+            
             if (type === 'CADEAU_ACHETE') {
                 const checkboxes = document.querySelectorAll('input[name="selected_events"]:checked');
-                checkboxes.forEach(cb => selectedEvents.push(cb.value));
+                checkboxes.forEach(function(cb) { selectedEvents.push(cb.value); });
             }
+
+            const montantInput = document.getElementById('mvt-montant');
+            const dateInput = document.getElementById('mvt-date');
+            const commInput = document.getElementById('mvt-commentaire');
 
             const mvt = {
                 mouvement_id: "mvt_" + Date.now(),
                 type: type,
-                montant: parseFloat(document.getElementById('mvt-montant').value),
-                date: document.getElementById('mvt-date').value,
-                commentaire: document.getElementById('mvt-commentaire').value,
+                montant: montantInput ? parseFloat(montantInput.value) : 0,
+                date: dateInput ? dateInput.value : '',
+                commentaire: commInput ? commInput.value : '',
                 evenement_ids: selectedEvents
             };
 
@@ -413,8 +438,10 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    document.getElementById('mouvement-form').reset();
-                    document.getElementById('cadeau-selection-container').classList.add('hidden');
+                    const form = document.getElementById('mouvement-form');
+                    if (form) form.reset();
+                    const container = document.getElementById('cadeau-selection-container');
+                    if (container) container.classList.add('hidden');
                     loadData();
                 } else {
                     alert("Erreur : " + result.message);
