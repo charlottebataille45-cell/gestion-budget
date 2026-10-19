@@ -106,7 +106,7 @@
                 <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
-                        <select id="mvt-type" class="w-full border border-slate-300 rounded p-2 text-sm">
+                        <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-slate-300 rounded p-2 text-sm">
                             <option value="REMBOURSEMENT_DECOUVERT">Remboursement Découvert</option>
                             <option value="VIREMENT_LIVRET">Virement Livret A</option>
                             <option value="CADEAU_ACHETE">Achat Cadeau</option>
@@ -123,6 +123,15 @@
                         <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
                         <input type="date" id="mvt-date" required class="w-full border border-slate-300 rounded p-2 text-sm">
                     </div>
+
+                    <!-- Conteneur dynamique pour lier un achat aux cadeaux/événements -->
+                    <div id="cadeau-selection-container" class="sm:col-span-3 hidden bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Sélectionner le ou les bénéficiaire(s) concerné(s) par cet achat :</label>
+                        <div id="checkboxes-evenements" class="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto text-xs">
+                            <!-- Rempli dynamiquement -->
+                        </div>
+                    </div>
+
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire / Détails</label>
                         <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Shooting photo Papy et Mamie">
@@ -216,6 +225,7 @@
             evtTbody.innerHTML = "";
             if (appData.evenements) {
                 appData.evenements.forEach(evt => {
+                    const isAchete = evt.statut === "ACHETE";
                     evtTbody.innerHTML += `
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="p-3 font-medium text-slate-700">${evt.type_evenement || 'CADEAU'}</td>
@@ -223,7 +233,7 @@
                             <td class="p-3 text-slate-500">${evt.prochaine_date}</td>
                             <td class="p-3 font-semibold">${evt.budget_cible} €</td>
                             <td class="p-3 font-semibold text-indigo-600">${evt.montant_depense || 0} €</td>
-                            <td class="p-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">${evt.statut}</span></td>
+                            <td class="p-3"><span class="text-xs ${isAchete ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'} px-2 py-0.5 rounded">${evt.statut}</span></td>
                             <td class="p-3 text-xs text-slate-500">${evt.commentaire || ''}</td>
                         </tr>
                     `;
@@ -283,14 +293,49 @@
             }
         }
 
+        function handleTypeChange() {
+            const type = document.getElementById('mvt-type').value;
+            const container = document.getElementById('cadeau-selection-container');
+            if (type === 'CADEAU_ACHETE') {
+                container.classList.remove('hidden');
+                renderCadeauxCheckboxes();
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function renderCadeauxCheckboxes() {
+            const cbContainer = document.getElementById('checkboxes-evenements');
+            cbContainer.innerHTML = '';
+            if (appData.evenements) {
+                appData.evenements.forEach(evt => {
+                    cbContainer.innerHTML += `
+                        <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">
+                            <input type="checkbox" name="selected_events" value="${evt.evenement_id}" class="rounded text-indigo-600">
+                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.type_evenement} - ${evt.budget_cible}€)</span></span>
+                        </label>
+                    `;
+                });
+            }
+        }
+
         async function submitMouvement(event) {
             event.preventDefault();
+            
+            let selectedEvents = [];
+            const type = document.getElementById('mvt-type').value;
+            if (type === 'CADEAU_ACHETE') {
+                const checkboxes = document.querySelectorAll('input[name="selected_events"]:checked');
+                checkboxes.forEach(cb => selectedEvents.push(cb.value));
+            }
+
             const mvt = {
                 mouvement_id: "mvt_" + Date.now(),
-                type: document.getElementById('mvt-type').value,
+                type: type,
                 montant: parseFloat(document.getElementById('mvt-montant').value),
                 date: document.getElementById('mvt-date').value,
-                commentaire: document.getElementById('mvt-commentaire').value
+                commentaire: document.getElementById('mvt-commentaire').value,
+                evenement_ids: selectedEvents
             };
 
             try {
@@ -300,8 +345,9 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    alert("Opération enregistrée avec succès !");
+                    alert("Opération enregistrée et événements mis à jour avec succès !");
                     document.getElementById('mouvement-form').reset();
+                    document.getElementById('cadeau-selection-container').classList.add('hidden');
                     loadData();
                 } else {
                     alert("Erreur : " + result.message);
