@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Planificateur Budgétaire</title>
+    <title>Mon Planificateur Budgétaire - Vue Claire</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -12,10 +12,10 @@
 
     <!-- En-tête -->
     <header class="bg-indigo-700 text-white shadow-md">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-chart-pie text-2xl"></i>
-                <h1 class="text-xl font-bold">Mon Planificateur Budgétaire</h1>
+                <i class="fa-solid fa-wallet text-2xl"></i>
+                <h1 class="text-xl font-bold">Mon Planificateur Budgétaire (Vue Réelle)</h1>
             </div>
             <div class="flex items-center space-x-2">
                 <span id="sync-status" class="text-xs bg-indigo-600 px-3 py-1 rounded-full text-indigo-100">Chargement...</span>
@@ -27,51 +27,73 @@
     </header>
 
     <!-- Navigation par Vues -->
-    <nav class="max-w-4xl mx-auto px-4 mt-4">
-        <div class="flex bg-white rounded-xl p-1 shadow-xs border border-slate-200 text-xs sm:text-sm font-medium">
+    <nav class="max-w-5xl mx-auto px-4 mt-4">
+        <div class="flex bg-white rounded-xl p-1 shadow-xs border border-slate-200 text-sm font-medium">
             <button onclick="switchView('planificateur')" id="btn-view-planificateur" class="flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs">
-                <i class="fa-solid fa-sliders mr-1"></i> Planificateur & Enveloppes
+                <i class="fa-solid fa-calendar-days mr-1"></i> Mes Enveloppes & Mensualisation
             </button>
             <button onclick="switchView('mouvements')" id="btn-view-mouvements" class="flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition">
-                <i class="fa-solid fa-list-check mr-1"></i> Operations & Journal
+                <i class="fa-solid fa-list-check mr-1"></i> Journal des Opérations
             </button>
         </div>
     </nav>
 
     <!-- Conteneur principal -->
-    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- VUE 1 : PLANIFICATEUR & ENVELOPPES -->
+        <!-- VUE 1 : PLANIFICATEUR, MENSUALISATION ET DEAD-LINES -->
         <div id="view-planificateur" class="space-y-6">
             
-            <!-- Cockpit Trésorerie -->
-            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
-                    <div class="text-slate-400 text-xs font-semibold uppercase">Découvert Bancaire</div>
-                    <div id="kpi-decouvert" class="text-2xl font-bold text-rose-600 mt-1">-700,00 €</div>
-                    <div class="text-xs text-slate-400 mt-1">Lissage Oct. (-200€) & Nov. (-500€)</div>
+            <!-- Alerte de Trésorerie & Situation Réelle -->
+            <section class="bg-rose-50 border border-rose-200 p-4 rounded-xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xl mt-0.5"></i>
+                    <div>
+                        <h3 class="font-bold text-rose-900 text-sm">Point de Situation & Redressement</h3>
+                        <p class="text-xs text-rose-700 mt-0.5">Découvert initial de 700 € en cours de lissage (-200€ en octobre, -500€ en novembre). L'épargne est mise en pause temporaire.</p>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
-                    <div class="text-slate-400 text-xs font-semibold uppercase">Livret A (Support)</div>
-                    <div id="kpi-livret" class="text-2xl font-bold text-indigo-600 mt-1">0,00 €</div>
-                    <div class="text-xs text-slate-400 mt-1">Total virtuel des enveloppes</div>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
-                    <div class="text-slate-400 text-xs font-semibold uppercase">Subvention CE Noël</div>
-                    <div class="text-2xl font-bold text-amber-600 mt-1">360,00 €</div>
-                    <div class="text-xs text-slate-400 mt-1">Attendue le 10/12/2026</div>
+                <div class="text-right bg-white px-4 py-2 rounded-lg border border-rose-100 shadow-2xs w-full sm:w-auto">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Découvert Actuel</div>
+                    <div class="text-lg font-bold text-rose-600">-700,00 €</div>
                 </div>
             </section>
 
-            <!-- Barres Horizontales Tricolores avec Dépliants Détaillés & Filtres -->
+            <!-- SECTION : CE QUE JE METS CHAQUE MOIS (Mensualisation) -->
+            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-coins text-indigo-600 mr-2"></i> Ma Mensualisation (Ce qui est prévu chaque mois)</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Répartition de votre effort d'épargne mensuel cible (300 € / mois au total une fois le découvert soldé).</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs text-slate-500 uppercase font-semibold">👝 Anniversaires</div>
+                        <div class="text-xl font-bold text-indigo-600 mt-1">65,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Objectif annuel : 770 €</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs text-slate-500 uppercase font-semibold">🎄 Noël</div>
+                        <div class="text-xl font-bold text-indigo-600 mt-1">35,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Reste à charge : 410 € (après CE 360€)</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-xs text-slate-500 uppercase font-semibold">🛡️ Épargne de Précaution</div>
+                        <div class="text-xl font-bold text-amber-600 mt-1">200,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Actif dès décembre (après découvert)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION : SUIVI DES ENVELOPPES & DEAD-LINES (AVEC VRAIS COULEURS) -->
             <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
                     <div>
-                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> Enveloppes Virtuelles</h2>
-                        <p class="text-xs text-slate-400">Cliquez sur une barre pour voir et filtrer le détail des personnes.</p>
+                        <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-600 mr-2"></i> État de mes Enveloppes & Dead-lines</h2>
+                        <p class="text-xs text-slate-400">Cliquez sur une enveloppe pour voir le détail des dead-lines et des personnes.</p>
                     </div>
                     <div class="flex items-center space-x-1 text-xs">
-                        <span class="text-slate-400 mr-1">Filtre rapide :</span>
+                        <span class="text-slate-400 mr-1">Filtre :</span>
                         <button onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">Tous</button>
                         <button onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
                         <button onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
@@ -87,9 +109,8 @@
         <!-- VUE 2 : OPÉRATIONS & JOURNAL -->
         <div id="view-mouvements" class="hidden space-y-6">
             
-            <!-- Saisie Dépense -->
             <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
-                <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Enregistrer une dépense ou un mouvement</h2>
+                <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Enregistrer une opération</h2>
                 <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
@@ -110,7 +131,7 @@
                     </div>
 
                     <div id="cadeau-selection-container" class="sm:col-span-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                        <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) par cet achat :</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) (Dead-lines) :</label>
                         <div id="checkboxes-evenements" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs max-h-40 overflow-y-auto">
                             <!-- Injection dynamique -->
                         </div>
@@ -126,10 +147,9 @@
                 </form>
             </section>
 
-            <!-- Historique avec option de SUPPRESSION -->
             <section class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
                 <div class="p-4 bg-slate-50 font-semibold text-slate-700 border-b border-slate-200 flex justify-between items-center">
-                    <span>Journal des opérations</span>
+                    <span>Historique des mouvements</span>
                     <button onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow-xs">Export ChatGPT</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -219,7 +239,6 @@
                         if (isMatch) {
                             totalConsomme += (evt.montant_depense || 0);
 
-                            // Application des filtres
                             if (currentFilter === 'TODO' && evt.statut !== 'ACHETE') eventsAssocies.push(evt);
                             else if (currentFilter === 'DONE' && evt.statut === 'ACHETE') eventsAssocies.push(evt);
                             else if (currentFilter === 'ALL') eventsAssocies.push(evt);
@@ -227,18 +246,20 @@
                     });
 
                     let pourcentage = Math.min(Math.round((totalConsomme / totalCible) * 100), 100);
-                    let barColor = "bg-emerald-500";
-                    let statusText = "Serein (OK)";
-                    let statusBadgeClass = "bg-emerald-50 text-emerald-700";
+                    
+                    // Logique de couleur réaliste : si on est en phase de redressement (découvert) ou dépassement, la jauge s'alerte
+                    let barColor = "bg-indigo-600";
+                    let statusText = "En cours de provision";
+                    let statusBadgeClass = "bg-indigo-50 text-indigo-700";
 
-                    if (pourcentage > 75) {
+                    if (totalConsomme > 0 && totalConsomme <= totalCible) {
                         barColor = "bg-amber-500";
-                        statusText = "Attention (En cours)";
+                        statusText = "Dépense engagée";
                         statusBadgeClass = "bg-amber-50 text-amber-700";
                     }
                     if (totalConsomme > totalCible) {
                         barColor = "bg-rose-600";
-                        statusText = "Dépassé / Urgent";
+                        statusText = "Dépassement !";
                         statusBadgeClass = "bg-rose-50 text-rose-700";
                     }
 
@@ -246,13 +267,13 @@
                     if (eventsAssocies.length > 0) {
                         detailsHTML = `
                             <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 bg-slate-50/80 p-3 rounded-lg space-y-2">
-                                <div class="text-xs font-semibold text-slate-500 mb-2">Détail (${eventsAssocies.length} éléments) :</div>
+                                <div class="text-xs font-semibold text-slate-500 mb-2"><i class="fa-solid fa-clock mr-1"></i> Dead-lines & Échéances associées :</div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                     ${eventsAssocies.map(evt => `
                                         <div class="bg-white p-2.5 rounded border border-slate-200 flex justify-between items-center shadow-2xs">
                                             <div>
                                                 <span class="font-bold text-slate-700">${evt.libelle}</span>
-                                                <span class="text-slate-400 block text-[10px]">${evt.prochaine_date || 'Échéance à venir'}</span>
+                                                <span class="text-rose-600 block text-[10px] font-semibold"><i class="fa-regular fa-calendar mr-1"></i> Échéance : ${evt.prochaine_date || 'Bientôt'}</span>
                                             </div>
                                             <div class="text-right">
                                                 <span class="font-semibold text-slate-800 block">${evt.montant_depense \vert{}\vert{} 0} € / ${evt.budget_cible} €</span>
@@ -268,7 +289,7 @@
                     } else {
                         detailsHTML = `
                             <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400 italic text-center py-2">
-                                Aucun élément ne correspond au filtre sélectionné.
+                                Aucun élément ne correspond au filtre.
                             </div>
                         `;
                     }
@@ -291,8 +312,8 @@
                             </div>
 
                             <div class="flex justify-between text-xs text-slate-400 mt-2">
-                                <span>Virement mensuel : ${env.virement_mensuel_cible || 0} €/mois</span>
-                                <span>Reste disponible : ${Math.max(totalCible - totalConsomme, 0)} €</span>
+                                <span>Versement mensuel prévu : <strong class="text-slate-700">${env.virement_mensuel_cible || 0} € / mois</strong></span>
+                                <span>Reste à financer : <strong class="text-slate-700">${Math.max(totalCible - totalConsomme, 0)} €</strong></span>
                             </div>
 
                             ${detailsHTML}
@@ -303,7 +324,6 @@
 
             renderCadeauxCheckboxes();
 
-            // Rendu journal avec BOUTON DE SUPPRESSION
             const mvtTbody = document.getElementById('mouvements-tbody');
             mvtTbody.innerHTML = "";
             if (appData.mouvements && appData.mouvements.length > 0) {
@@ -315,7 +335,7 @@
                             <td class="p-3 font-bold ${mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800'} text-xs">${mvt.montant} €</td>
                             <td class="p-3 text-slate-600 text-xs">${mvt.commentaire || ''}</td>
                             <td class="p-3 text-right">
-                                <button onclick="deleteMouvement('${mvt.mouvement_id}')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer cette opération">
+                                <button onclick="deleteMouvement('${mvt.mouvement_id}')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </td>
@@ -323,13 +343,12 @@
                     `;
                 });
             } else {
-                mvtTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement pour l'instant.</td></tr>`;
+                mvtTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement enregistré.</td></tr>`;
             }
         }
 
         async function deleteMouvement(mvtId) {
-            if (!confirm("Voulez-vous vraiment supprimer cet achat ? L'impact sur les enveloppes sera automatiquement annulé.")) return;
-
+            if (!confirm("Voulez-vous supprimer cette opération ?")) return;
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
@@ -337,7 +356,6 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    alert("Opération supprimée avec succès !");
                     loadData();
                 } else {
                     alert("Erreur : " + result.message);
@@ -360,11 +378,12 @@
             const cbContainer = document.getElementById('checkboxes-evenements');
             cbContainer.innerHTML = '';
             if (appData.evenements) {
+                appData.evenements.externes = true;
                 appData.evenements.forEach(evt => {
                     cbContainer.innerHTML += `
                         <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">
                             <input type="checkbox" name="selected_events" value="${evt.evenement_id}" class="rounded text-indigo-600">
-                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.evenement_id.startsWith('noel_') ? 'Noël' : 'Anniv'} - ${evt.budget_cible}€)</span></span>
+                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.prochaine_date || 'Date non fixée'} - ${evt.budget_cible}€)</span></span>
                         </label>
                     `;
                 });
@@ -382,7 +401,6 @@
             event.preventDefault();
             let selectedEvents = [];
             const type = document.getElementById('mvt-type').value;
-            
             if (type === 'CADEAU_ACHETE') {
                 const checkboxes = document.querySelectorAll('input[name="selected_events"]:checked');
                 checkboxes.forEach(cb => selectedEvents.push(cb.value));
@@ -404,7 +422,6 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    alert("Dépense enregistrée !");
                     document.getElementById('mouvement-form').reset();
                     document.getElementById('cadeau-selection-container').classList.add('hidden');
                     loadData();
