@@ -10,7 +10,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-12">
 
-    <!-- En-tête épuré -->
+    <!-- En-tête -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -19,116 +19,145 @@
             </div>
             <div class="flex items-center space-x-2">
                 <span id="sync-status" class="text-xs bg-indigo-600 px-3 py-1 rounded-full text-indigo-100">Chargement...</span>
-                <button onclick="loadData()" class="bg-indigo-600 hover:bg-indigo-800 text-white text-xs px-3 py-1.5 rounded transition">
-                    <i class="fa-solid fa-sync"></i>
+                <button onclick="loadData()" class="bg-indigo-600 hover:bg-indigo-800 text-white text-xs px-3 py-1.5 rounded transition shadow">
+                    <i class="fa-solid fa-sync mr-1"></i> Actualiser
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Conteneur principal recentré -->
+    <!-- Navigation par Vues -->
+    <nav class="max-w-4xl mx-auto px-4 mt-4">
+        <div class="flex bg-white rounded-xl p-1 shadow-xs border border-slate-200 text-xs sm:text-sm font-medium">
+            <button onclick="switchView('planificateur')" id="btn-view-planificateur" class="flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs">
+                <i class="fa-solid fa-sliders mr-1"></i> Planificateur & Enveloppes
+            </button>
+            <button onclick="switchView('mouvements')" id="btn-view-mouvements" class="flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition">
+                <i class="fa-solid fa-list-check mr-1"></i> Operations & Journal
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteneur principal -->
     <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- 1. Cockpit de Trésorerie -->
-        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="text-slate-400 text-xs font-semibold uppercase">Découvert Bancaire</div>
-                <div id="kpi-decouvert" class="text-2xl font-bold text-rose-600 mt-1">-700,00 €</div>
-                <div class="text-xs text-slate-400 mt-1">À résorber (Objectif nov.)</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="text-slate-400 text-xs font-semibold uppercase">Livret A (Support)</div>
-                <div id="kpi-livret" class="text-2xl font-bold text-indigo-600 mt-1">0,00 €</div>
-                <div class="text-xs text-slate-400 mt-1">Total virtuel des enveloppes</div>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="text-slate-400 text-xs font-semibold uppercase">Prochaine Paie</div>
-                <div class="text-2xl font-bold text-emerald-600 mt-1">25 du mois</div>
-                <div class="text-xs text-slate-400 mt-1">Cycle budgétaire en cours</div>
-            </div>
-        </section>
-
-        <!-- 2. Les Barres Horizontales Tricolores (Enveloppes) -->
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> État de mes Enveloppes Virtuelles</h2>
-                <span class="text-xs text-slate-400">Vert = OK | Orange = Attention | Rouge = Déppassé</span>
-            </div>
+        <!-- VUE 1 : PLANIFICATEUR & ENVELOPPES -->
+        <div id="view-planificateur" class="space-y-6">
             
-            <div id="barres-enveloppes-container" class="space-y-6">
-                <!-- Rempli dynamiquement par JS -->
-            </div>
-        </section>
+            <!-- Cockpit Trésorerie -->
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
+                    <div class="text-slate-400 text-xs font-semibold uppercase">Découvert Bancaire</div>
+                    <div id="kpi-decouvert" class="text-2xl font-bold text-rose-600 mt-1">-700,00 €</div>
+                    <div class="text-xs text-slate-400 mt-1">Lissage Oct. (-200€) & Nov. (-500€)</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
+                    <div class="text-slate-400 text-xs font-semibold uppercase">Livret A (Support)</div>
+                    <div id="kpi-livret" class="text-2xl font-bold text-indigo-600 mt-1">0,00 €</div>
+                    <div class="text-xs text-slate-400 mt-1">Total virtuel des enveloppes</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
+                    <div class="text-slate-400 text-xs font-semibold uppercase">Subvention CE Noël</div>
+                    <div class="text-2xl font-bold text-amber-600 mt-1">360,00 €</div>
+                    <div class="text-xs text-slate-400 mt-1">Attendue le 10/12/2026</div>
+                </div>
+            </section>
 
-        <!-- 3. Enregistrement rapide d'une opération -->
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-            <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Enregistrer une dépense ou un mouvement</h2>
-            <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
-                    <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-50">
-                        <option value="CADEAU_ACHETE">Achat Cadeau (Anniversaire / Noël)</option>
-                        <option value="REMBOURSEMENT_DECOUVERT">Remboursement Découvert</option>
-                        <option value="VIREMENT_LIVRET">Virement Livret A</option>
-                        <option value="DEPENSE_FIXE">Dépense Fixe</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Montant (€)</label>
-                    <input type="number" step="0.01" id="mvt-montant" required class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="0.00">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                    <input type="date" id="mvt-date" required class="w-full border border-slate-300 rounded p-2 text-sm">
-                </div>
-
-                <!-- Sélection des bénéficiaires si c'est un cadeau -->
-                <div id="cadeau-selection-container" class="sm:col-span-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) :</label>
-                    <div id="checkboxes-evenements" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs max-h-36 overflow-y-auto">
-                        <!-- Rempli dynamiquement -->
+            <!-- Barres Horizontales Tricolores avec Dépliants Détaillés & Filtres -->
+            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> Enveloppes Virtuelles</h2>
+                        <p class="text-xs text-slate-400">Cliquez sur une barre pour voir et filtrer le détail des personnes.</p>
+                    </div>
+                    <div class="flex items-center space-x-1 text-xs">
+                        <span class="text-slate-400 mr-1">Filtre rapide :</span>
+                        <button onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">Tous</button>
+                        <button onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
+                        <button onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
                     </div>
                 </div>
-
-                <div class="sm:col-span-3">
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
-                    <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Shooting photo Papy et Mamie">
+                
+                <div id="barres-enveloppes-container" class="space-y-6">
+                    <!-- Injection dynamique -->
                 </div>
-                <div>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm transition shadow font-medium">Ajouter l'opération</button>
-                </div>
-            </form>
-        </section>
+            </section>
+        </div>
 
-        <!-- 4. Historique simple -->
-        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-4 bg-slate-50 font-semibold text-slate-700 border-b border-slate-200 flex justify-between items-center">
-                <span>Derniers mouvements enregistrés</span>
-                <button onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow">Export ChatGPT</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-50/50 text-slate-400 text-xs border-b border-slate-100">
-                            <th class="p-3">Date</th>
-                            <th class="p-3">Type</th>
-                            <th class="p-3">Montant</th>
-                            <th class="p-3">Commentaire</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mouvements-tbody">
-                        <!-- Injection dynamique -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <!-- VUE 2 : OPÉRATIONS & JOURNAL -->
+        <div id="view-mouvements" class="hidden space-y-6">
+            
+            <!-- Saisie Dépense -->
+            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
+                <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Enregistrer une dépense ou un mouvement</h2>
+                <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
+                        <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-50">
+                            <option value="CADEAU_ACHETE">Achat Cadeau (Anniversaire / Noël)</option>
+                            <option value="REMBOURSEMENT_DECOUVERT">Remboursement Découvert</option>
+                            <option value="VIREMENT_LIVRET">Virement Livret A</option>
+                            <option value="DEPENSE_FIXE">Dépense Fixe</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Montant (€)</label>
+                        <input type="number" step="0.01" id="mvt-montant" required class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
+                        <input type="date" id="mvt-date" required class="w-full border border-slate-300 rounded p-2 text-sm">
+                    </div>
+
+                    <div id="cadeau-selection-container" class="sm:col-span-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) par cet achat :</label>
+                        <div id="checkboxes-evenements" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs max-h-40 overflow-y-auto">
+                            <!-- Injection dynamique -->
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
+                        <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Shooting photo Papy et Mamie">
+                    </div>
+                    <div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm transition shadow-xs font-medium">Enregistrer</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Historique avec option de SUPPRESSION -->
+            <section class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 font-semibold text-slate-700 border-b border-slate-200 flex justify-between items-center">
+                    <span>Journal des opérations</span>
+                    <button onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow-xs">Export ChatGPT</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50/50 text-slate-400 text-xs border-b border-slate-100">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Type</th>
+                                <th class="p-3">Montant</th>
+                                <th class="p-3">Commentaire</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mouvements-tbody">
+                            <!-- Injection dynamique -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
     </main>
 
-    <!-- Script du Planificateur Visuel -->
+    <!-- Script de l'Application -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyacLnP3LckVdG6O6gnA4_Nszu6y_lQOo7HE8_tQZnHzYNeOkrVZ6X_ThSp2ZmN0IBibw/exec";
         let appData = {};
+        let currentFilter = 'ALL';
 
         async function loadData() {
             const statusEl = document.getElementById('sync-status');
@@ -151,32 +180,53 @@
             }
         }
 
+        function switchView(viewName) {
+            document.getElementById('view-planificateur').classList.add('hidden');
+            document.getElementById('view-mouvements').classList.add('hidden');
+            document.getElementById('btn-view-planificateur').className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+            document.getElementById('btn-view-mouvements').className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            document.getElementById('btn-view-' + viewName).className = "flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs";
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            ['ALL', 'TODO', 'DONE'].forEach(f => {
+                document.getElementById('filter-btn-' + f).className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
+            });
+            document.getElementById('filter-btn-' + filterType).className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
+            renderPlanificateur();
+        }
+
         function renderPlanificateur() {
-            // 1. Calcul et rendu des barres horizontales tricolores pour les enveloppes
             const container = document.getElementById('barres-enveloppes-container');
             container.innerHTML = "";
 
             if (appData.enveloppes && appData.evenements) {
                 appData.enveloppes.forEach(env => {
-                    // Calculons le montant total dépensé ou ciblé pour cette enveloppe
+                    let eventsAssocies = [];
                     let totalCible = env.budget_annuel || env.budget_annuel_brut || 770;
-                    if (env.enveloppe_id === 'precaution') totalCible = 2400; // Objectif indicatif
+                    if (env.enveloppe_id === 'precaution') totalCible = 2400;
 
-                    // Sommons les dépenses réelles des événements liés à cette catégorie
                     let totalConsomme = 0;
+
                     appData.evenements.forEach(evt => {
-                        if (env.enveloppe_id === 'anniversaires' && evt.evenement_id.startsWith('anniv_')) {
+                        let isMatch = false;
+                        if (env.enveloppe_id === 'anniversaires' && (evt.evenement_id.startsWith('anniv_') || evt.type_evenement === 'ANNIVERSAIRE')) isMatch = true;
+                        if (env.enveloppe_id === 'noel' && (evt.evenement_id.startsWith('noel_') || evt.type_evenement === 'NOEL')) isMatch = true;
+
+                        if (isMatch) {
                             totalConsomme += (evt.montant_depense || 0);
-                        } else if (env.enveloppe_id === 'noel' && evt.evenement_id.startsWith('noel_')) {
-                            totalConsomme += (evt.montant_depense || 0);
+
+                            // Application des filtres
+                            if (currentFilter === 'TODO' && evt.statut !== 'ACHETE') eventsAssocies.push(evt);
+                            else if (currentFilter === 'DONE' && evt.statut === 'ACHETE') eventsAssocies.push(evt);
+                            else if (currentFilter === 'ALL') eventsAssocies.push(evt);
                         }
                     });
 
-                    // Pourcentage de remplissage / consommation
                     let pourcentage = Math.min(Math.round((totalConsomme / totalCible) * 100), 100);
-                    
-                    // Détermination de la couleur tricolore :
-                    // Vert si tout va bien / début, Orange si ça approche, Rouge si dépassement ou zone critique
                     let barColor = "bg-emerald-500";
                     let statusText = "Serein (OK)";
                     let statusBadgeClass = "bg-emerald-50 text-emerald-700";
@@ -192,47 +242,117 @@
                         statusBadgeClass = "bg-rose-50 text-rose-700";
                     }
 
-                    container.innerHTML += `
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="font-bold text-slate-700">${env.libelle}</span>
-                                <div class="space-x-2">
-                                    <span class="text-xs px-2 py-0.5 rounded font-medium ${statusBadgeClass}">${statusText}</span>
-                                    <span class="font-semibold text-slate-600">${totalConsomme} € / ${totalCible} €</span>
+                    let detailsHTML = "";
+                    if (eventsAssocies.length > 0) {
+                        detailsHTML = `
+                            <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 bg-slate-50/80 p-3 rounded-lg space-y-2">
+                                <div class="text-xs font-semibold text-slate-500 mb-2">Détail (${eventsAssocies.length} éléments) :</div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    ${eventsAssocies.map(evt => `
+                                        <div class="bg-white p-2.5 rounded border border-slate-200 flex justify-between items-center shadow-2xs">
+                                            <div>
+                                                <span class="font-bold text-slate-700">${evt.libelle}</span>
+                                                <span class="text-slate-400 block text-[10px]">${evt.prochaine_date || 'Échéance à venir'}</span>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="font-semibold text-slate-800 block">${evt.montant_depense \vert{}\vert{} 0} € / ${evt.budget_cible} €</span>
+                                                <span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                                    ${evt.statut === 'ACHETE' ? '✓ Acheté' : 'À provisionner'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
                                 </div>
                             </div>
-                            <!-- Barre horizontale tricolore -->
-                            <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        `;
+                    } else {
+                        detailsHTML = `
+                            <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400 italic text-center py-2">
+                                Aucun élément ne correspond au filtre sélectionné.
+                            </div>
+                        `;
+                    }
+
+                    container.innerHTML += `
+                        <div class="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition bg-white shadow-2xs">
+                            <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleDetails('details-${env.enveloppe_id}')">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs transition-transform duration-200" id="icon-details-${env.enveloppe_id}"></i>
+                                    <span class="font-bold text-slate-800 text-base">${env.libelle}</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-xs px-2 py-0.5 rounded font-medium ${statusBadgeClass}">${statusText}</span>
+                                    <span class="font-bold text-slate-700">${totalConsomme} € <span class="text-slate-400 font-normal">/ ${totalCible} €</span></span>
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200 mt-3 cursor-pointer" onclick="toggleDetails('details-${env.enveloppe_id}')">
                                 <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${Math.max(pourcentage, 3)}%;"></div>
                             </div>
-                            <div class="flex justify-between text-xs text-slate-400">
-                                <span>Virement cible : ${env.virement_mensuel_cible || 0} € / mois</span>
-                                <span>Reste : ${Math.max(totalCible - totalConsomme, 0)} €</span>
+
+                            <div class="flex justify-between text-xs text-slate-400 mt-2">
+                                <span>Virement mensuel : ${env.virement_mensuel_cible || 0} €/mois</span>
+                                <span>Reste disponible : ${Math.max(totalCible - totalConsomme, 0)} €</span>
                             </div>
+
+                            ${detailsHTML}
                         </div>
                     `;
                 });
             }
 
-            // 2. Rendu des cases à cocher pour les cadeaux
             renderCadeauxCheckboxes();
 
-            // 3. Rendu du journal des mouvements
+            // Rendu journal avec BOUTON DE SUPPRESSION
             const mvtTbody = document.getElementById('mouvements-tbody');
             mvtTbody.innerHTML = "";
             if (appData.mouvements && appData.mouvements.length > 0) {
                 appData.mouvements.forEach(mvt => {
                     mvtTbody.innerHTML += `
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="p-3 text-slate-500">${mvt.date}</td>
-                            <td class="p-3 font-medium text-slate-700">${mvt.type}</td>
-                            <td class="p-3 font-bold ${mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800'}">${mvt.montant} €</td>
-                            <td class="p-3 text-slate-600">${mvt.commentaire || ''}</td>
+                            <td class="p-3 text-slate-500 text-xs">${mvt.date}</td>
+                            <td class="p-3 font-medium text-slate-700 text-xs">${mvt.type}</td>
+                            <td class="p-3 font-bold ${mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800'} text-xs">${mvt.montant} €</td>
+                            <td class="p-3 text-slate-600 text-xs">${mvt.commentaire || ''}</td>
+                            <td class="p-3 text-right">
+                                <button onclick="deleteMouvement('${mvt.mouvement_id}')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer cette opération">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                 });
             } else {
-                mvtTbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement pour l'instant.</td></tr>`;
+                mvtTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-sm">Aucun mouvement pour l'instant.</td></tr>`;
+            }
+        }
+
+        async function deleteMouvement(mvtId) {
+            if (!confirm("Voulez-vous vraiment supprimer cet achat ? L'impact sur les enveloppes sera automatiquement annulé.")) return;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "delete_mouvement", mouvement_id: mvtId })
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    alert("Opération supprimée avec succès !");
+                    loadData();
+                } else {
+                    alert("Erreur : " + result.message);
+                }
+            } catch (err) {
+                alert("Erreur réseau : " + err);
+            }
+        }
+
+        function toggleDetails(elementId) {
+            const el = document.getElementById(elementId);
+            const icon = document.getElementById('icon-' + elementId);
+            if (el) {
+                el.classList.toggle('hidden');
+                if (icon) icon.classList.toggle('rotate-90');
             }
         }
 
@@ -244,7 +364,7 @@
                     cbContainer.innerHTML += `
                         <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">
                             <input type="checkbox" name="selected_events" value="${evt.evenement_id}" class="rounded text-indigo-600">
-                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.type_evenement === 'NOEL' ? 'Noël' : 'Anniv'} - ${evt.budget_cible}€)</span></span>
+                            <span class="truncate"><b>${evt.libelle}</b> <span class="text-slate-400">(${evt.evenement_id.startsWith('noel_') ? 'Noël' : 'Anniv'} - ${evt.budget_cible}€)</span></span>
                         </label>
                     `;
                 });
@@ -254,11 +374,8 @@
         function handleTypeChange() {
             const type = document.getElementById('mvt-type').value;
             const container = document.getElementById('cadeau-selection-container');
-            if (type === 'CADEAU_ACHETE') {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
+            if (type === 'CADEAU_ACHETE') container.classList.remove('hidden');
+            else container.classList.add('hidden');
         }
 
         async function submitMouvement(event) {
@@ -287,7 +404,7 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    alert("Opération enregistrée !");
+                    alert("Dépense enregistrée !");
                     document.getElementById('mouvement-form').reset();
                     document.getElementById('cadeau-selection-container').classList.add('hidden');
                     loadData();
