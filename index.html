@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion Budgétaire - Enveloppes Virtuelles</title>
-    <!-- Tailwind CSS pour un design propre et responsive -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </head>
@@ -67,7 +67,7 @@
         <!-- Contenu : Enveloppes -->
         <div id="tab-enveloppes" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="enveloppes-container">
-                <!-- Injection dynamique des enveloppes -->
+                <!-- Injection dynamique -->
             </div>
         </div>
 
@@ -86,8 +86,9 @@
                                 <th class="p-3">Bénéficiaire</th>
                                 <th class="p-3">Date</th>
                                 <th class="p-3">Budget Cible</th>
+                                <th class="p-3">Dépensé</th>
                                 <th class="p-3">Statut</th>
-                                <th class="p-3">Actions</th>
+                                <th class="p-3">Commentaire</th>
                             </tr>
                         </thead>
                         <tbody id="evenements-tbody">
@@ -124,7 +125,7 @@
                     </div>
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire / Détails</label>
-                        <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Cadeau grand-père payé">
+                        <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Shooting photo Papy et Mamie">
                     </div>
                     <div>
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm transition">Enregistrer</button>
@@ -163,7 +164,6 @@
 
     <!-- Script de logique frontend -->
     <script>
-        // URL DE VOTRE API GOOGLE APPS SCRIPT
         const API_URL = "https://script.google.com/macros/s/AKfycbyacLnP3LckVdG6O6gnA4_Nszu6y_lQOo7HE8_tQZnHzYNeOkrVZ6X_ThSp2ZmN0IBibw/exec";
 
         let appData = {};
@@ -222,8 +222,9 @@
                             <td class="p-3">${evt.libelle}</td>
                             <td class="p-3 text-slate-500">${evt.prochaine_date}</td>
                             <td class="p-3 font-semibold">${evt.budget_cible} €</td>
+                            <td class="p-3 font-semibold text-indigo-600">${evt.montant_depense || 0} €</td>
                             <td class="p-3"><span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">${evt.statut}</span></td>
-                            <td class="p-3 text-xs text-indigo-600 font-medium">${evt.commentaire || ''}</td>
+                            <td class="p-3 text-xs text-slate-500">${evt.commentaire || ''}</td>
                         </tr>
                     `;
                 });
@@ -329,7 +330,6 @@
             document.getElementById('tab-btn-' + tabName).className = "py-2 border-b-2 border-indigo-600 text-indigo-600 font-medium text-sm focus:outline-none";
         }
 
-        // Chargement initial au démarrage de la page
         window.onload = loadData;
     </script>
 </body>
