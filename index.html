@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Planificateur Budgétaire - Vue Claire</title>
+    <title>Mon Planificateur Budgétaire</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -15,7 +15,7 @@
         <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <i class="fa-solid fa-wallet text-2xl"></i>
-                <h1 class="text-xl font-bold">Mon Planificateur Budgétaire (Vue Réelle)</h1>
+                <h1 class="text-xl font-bold">Mon Planificateur Budgétaire</h1>
             </div>
             <div class="flex items-center space-x-2">
                 <span id="sync-status" class="text-xs bg-indigo-600 px-3 py-1 rounded-full text-indigo-100">Chargement...</span>
@@ -85,7 +85,7 @@
                 </div>
             </section>
 
-            <!-- SECTION : SUIVI DES ENVELOPPES & DEAD-LINES (AVEC VRAIS COULEURS) -->
+            <!-- SECTION : SUIVI DES ENVELOPPES & DEAD-LINES -->
             <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -213,9 +213,11 @@
         function setFilter(filterType) {
             currentFilter = filterType;
             ['ALL', 'TODO', 'DONE'].forEach(f => {
-                document.getElementById('filter-btn-' + f).className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
+                const btn = document.getElementById('filter-btn-' + f);
+                if (btn) btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
             });
-            document.getElementById('filter-btn-' + filterType).className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
+            const activeBtn = document.getElementById('filter-btn-' + filterType);
+            if (activeBtn) activeBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
             renderPlanificateur();
         }
 
@@ -246,8 +248,6 @@
                     });
 
                     let pourcentage = Math.min(Math.round((totalConsomme / totalCible) * 100), 100);
-                    
-                    // Logique de couleur réaliste : si on est en phase de redressement (découvert) ou dépassement, la jauge s'alerte
                     let barColor = "bg-indigo-600";
                     let statusText = "En cours de provision";
                     let statusBadgeClass = "bg-indigo-50 text-indigo-700";
@@ -263,62 +263,54 @@
                         statusBadgeClass = "bg-rose-50 text-rose-700";
                     }
 
-                    let detailsHTML = "";
+                    // Construction sécurisée du HTML des sous-éléments sans backticks imbriqués
+                    let listItemsHTML = "";
                     if (eventsAssocies.length > 0) {
-                        detailsHTML = `
-                            <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 bg-slate-50/80 p-3 rounded-lg space-y-2">
-                                <div class="text-xs font-semibold text-slate-500 mb-2"><i class="fa-solid fa-clock mr-1"></i> Dead-lines & Échéances associées :</div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                    ${eventsAssocies.map(evt => `
-                                        <div class="bg-white p-2.5 rounded border border-slate-200 flex justify-between items-center shadow-2xs">
-                                            <div>
-                                                <span class="font-bold text-slate-700">${evt.libelle}</span>
-                                                <span class="text-rose-600 block text-[10px] font-semibold"><i class="fa-regular fa-calendar mr-1"></i> Échéance : ${evt.prochaine_date || 'Bientôt'}</span>
-                                            </div>
-                                            <div class="text-right">
-                                                <span class="font-semibold text-slate-800 block">${evt.montant_depense \vert{}\vert{} 0} € / ${evt.budget_cible} €</span>
-                                                <span class="text-[10px] px-1.5 py-0.2 rounded font-medium ${evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                                    ${evt.statut === 'ACHETE' ? '✓ Acheté' : 'À provisionner'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
+                        eventsAssocies.forEach(evt => {
+                            let badgeClass = evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                            let badgeText = evt.statut === 'ACHETE' ? '✓ Acheté' : 'À provisionner';
+                            let montantDep = evt.montant_depense || 0;
+                            
+                            listItemsHTML += '<div class="bg-white p-2.5 rounded border border-slate-200 flex justify-between items-center shadow-2xs">' +
+                                '<div>' +
+                                    '<span class="font-bold text-slate-700">' + evt.libelle + '</span>' +
+                                    '<span class="text-rose-600 block text-[10px] font-semibold"><i class="fa-regular fa-calendar mr-1"></i> Échéance : ' + (evt.prochaine_date || 'Bientôt') + '</span>' +
+                                '</div>' +
+                                '<div class="text-right">' +
+                                    '<span class="font-semibold text-slate-800 block">' + montantDep + ' € / ' + evt.budget_cible + ' €</span>' +
+                                    '<span class="text-[10px] px-1.5 py-0.5 rounded font-medium ' + badgeClass + '">' + badgeText + '</span>' +
+                                '</div>' +
+                            '</div>';
+                        });
                     } else {
-                        detailsHTML = `
-                            <div id="details-${env.enveloppe_id}" class="hidden mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400 italic text-center py-2">
-                                Aucun élément ne correspond au filtre.
-                            </div>
-                        `;
+                        listItemsHTML = '<div class="text-xs text-slate-400 italic text-center py-2">Aucun élément ne correspond au filtre.</div>';
                     }
 
-                    container.innerHTML += `
-                        <div class="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition bg-white shadow-2xs">
-                            <div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleDetails('details-${env.enveloppe_id}')">
-                                <div class="flex items-center space-x-2">
-                                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs transition-transform duration-200" id="icon-details-${env.enveloppe_id}"></i>
-                                    <span class="font-bold text-slate-800 text-base">${env.libelle}</span>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-xs px-2 py-0.5 rounded font-medium ${statusBadgeClass}">${statusText}</span>
-                                    <span class="font-bold text-slate-700">${totalConsomme} € <span class="text-slate-400 font-normal">/ ${totalCible} €</span></span>
-                                </div>
-                            </div>
+                    let detailsHTML = '<div id="details-' + env.enveloppe_id + '" class="hidden mt-3 pt-3 border-t border-slate-100 bg-slate-50/80 p-3 rounded-lg space-y-2">' +
+                        '<div class="text-xs font-semibold text-slate-500 mb-2"><i class="fa-solid fa-clock mr-1"></i> Dead-lines & Échéances associées :</div>' +
+                        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">' + listItemsHTML + '</div>' +
+                    '</div>';
 
-                            <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200 mt-3 cursor-pointer" onclick="toggleDetails('details-${env.enveloppe_id}')">
-                                <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${Math.max(pourcentage, 3)}%;"></div>
-                            </div>
-
-                            <div class="flex justify-between text-xs text-slate-400 mt-2">
-                                <span>Versement mensuel prévu : <strong class="text-slate-700">${env.virement_mensuel_cible || 0} € / mois</strong></span>
-                                <span>Reste à financer : <strong class="text-slate-700">${Math.max(totalCible - totalConsomme, 0)} €</strong></span>
-                            </div>
-
-                            ${detailsHTML}
-                        </div>
-                    `;
+                    container.innerHTML += '<div class="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition bg-white shadow-2xs">' +
+                        '<div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleDetails(\'details-' + env.enveloppe_id + '\')">' +
+                            '<div class="flex items-center space-x-2">' +
+                                '<i class="fa-solid fa-chevron-right text-slate-400 text-xs transition-transform duration-200" id="icon-details-' + env.enveloppe_id + '"></i>' +
+                                '<span class="font-bold text-slate-800 text-base">' + env.libelle + '</span>' +
+                            '</div>' +
+                            '<div class="flex items-center space-x-3">' +
+                                '<span class="text-xs px-2 py-0.5 rounded font-medium ' + statusBadgeClass + '">' + statusText + '</span>' +
+                                '<span class="font-bold text-slate-700">' + totalConsomme + ' € <span class="text-slate-400 font-normal">/ ' + totalCible + ' €</span></span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200 mt-3 cursor-pointer" onclick="toggleDetails(\'details-' + env.enveloppe_id + '\')">' +
+                            '<div class="' + barColor + ' h-full rounded-full transition-all duration-500" style="width: ' + Math.max(pourcentage, 3) + '%;"></div>' +
+                        '</div>' +
+                        '<div class="flex justify-between text-xs text-slate-400 mt-2">' +
+                            '<span>Versement mensuel prévu : <strong class="text-slate-700">' + (env.virement_mensuel_cible || 0) + ' € / mois</strong></span>' +
+                            '<span>Reste à financer : <strong class="text-slate-700">' + Math.max(totalCible - totalConsomme, 0) + ' €</strong></span>' +
+                        '</div>' +
+                        detailsHTML +
+                    '</div>';
                 });
             }
 
@@ -378,7 +370,6 @@
             const cbContainer = document.getElementById('checkboxes-evenements');
             cbContainer.innerHTML = '';
             if (appData.evenements) {
-                appData.evenements.externes = true;
                 appData.evenements.forEach(evt => {
                     cbContainer.innerHTML += `
                         <label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">
