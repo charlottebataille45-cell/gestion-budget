@@ -7,96 +7,172 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-12">
+<body class="bg-rose-50/30 text-slate-700 font-sans min-h-screen pb-12">
 
-    <!-- En-tête -->
-    <header class="bg-indigo-700 text-white shadow-md">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+    <!-- En-tête Chic & Girly -->
+    <header class="bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-6 py-5 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-wallet text-2xl"></i>
-                <h1 class="text-xl font-bold">Mon Planificateur Budgétaire</h1>
+                <div class="bg-white/20 p-2.5 rounded-2xl backdrop-blur-sm">
+                    <i class="fa-solid fa-heart-circle-bolt text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Mon Planificateur Serein</h1>
+                    <p class="text-xs text-rose-100">Pilotage, Échéancier & Enveloppes</p>
+                </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <span id="sync-status" class="text-xs bg-indigo-600 px-3 py-1 rounded-full text-indigo-100">Chargement...</span>
-                <button onclick="loadData()" class="bg-indigo-600 hover:bg-indigo-800 text-white text-xs px-3 py-1.5 rounded transition shadow">
+            <div class="flex items-center space-x-3">
+                <span id="sync-status" class="text-xs bg-white/20 px-3 py-1 rounded-full text-white backdrop-blur-sm">Chargement...</span>
+                <button type="button" onclick="loadData()" class="bg-white/20 hover:bg-white/30 text-white text-xs px-3.5 py-2 rounded-xl transition backdrop-blur-sm shadow-xs">
                     <i class="fa-solid fa-sync mr-1"></i> Actualiser
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Navigation par Vues -->
-    <nav class="max-w-5xl mx-auto px-4 mt-4">
-        <div class="flex bg-white rounded-xl p-1 shadow-xs border border-slate-200 text-sm font-medium">
-            <button onclick="switchView('planificateur')" id="btn-view-planificateur" class="flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs">
-                <i class="fa-solid fa-calendar-days mr-1"></i> Mes Enveloppes & Mensualisation
+    <!-- Navigation par Vues (Onglets modernes) -->
+    <nav class="max-w-5xl mx-auto px-6 mt-6">
+        <div class="flex bg-white rounded-2xl p-1.5 shadow-sm border border-rose-100 text-sm font-semibold">
+            <button type="button" onclick="switchView('echeancier')" id="btn-view-echeancier" class="flex-1 py-2.5 rounded-xl text-center bg-rose-500 text-white transition shadow-sm">
+                <i class="fa-solid fa-timeline mr-2"></i> Échéancier & Objectifs
             </button>
-            <button onclick="switchView('mouvements')" id="btn-view-mouvements" class="flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition">
-                <i class="fa-solid fa-list-check mr-1"></i> Journal des Opérations
+            <button type="button" onclick="switchView('planificateur')" id="btn-view-planificateur" class="flex-1 py-2.5 rounded-xl text-center text-slate-500 hover:text-rose-600 transition">
+                <i class="fa-solid fa-wallet mr-2"></i> Mes Enveloppes & Dead-lines
+            </button>
+            <button type="button" onclick="switchView('mouvements')" id="btn-view-mouvements" class="flex-1 py-2.5 rounded-xl text-center text-slate-500 hover:text-rose-600 transition">
+                <i class="fa-solid fa-list-check mr-2"></i> Journal & Saisie
             </button>
         </div>
     </nav>
 
     <!-- Conteneur principal -->
-    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+    <main class="max-w-5xl mx-auto px-6 mt-6 space-y-6">
 
-        <!-- VUE 1 : PLANIFICATEUR, MENSUALISATION ET DEAD-LINES -->
-        <div id="view-planificateur" class="space-y-6">
+        <!-- VUE 1 : ÉCHÉANCIER & OBJECTIFS (NOUVELLE VUE) -->
+        <div id="view-echeancier" class="space-y-6">
             
-            <!-- Alerte de Trésorerie & Situation Réelle -->
-            <section class="bg-rose-50 border border-rose-200 p-4 rounded-xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-start space-x-3">
-                    <i class="fa-solid fa-triangle-exclamation text-rose-600 text-xl mt-0.5"></i>
+            <!-- Carte d'introduction objectifs -->
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
+                <div class="flex items-center space-x-3 border-b border-rose-50 pb-4">
+                    <div class="bg-rose-100 text-rose-600 p-3 rounded-2xl">
+                        <i class="fa-solid fa-compass text-lg"></i>
+                    </div>
                     <div>
-                        <h3 class="font-bold text-rose-900 text-sm">Point de Situation & Redressement</h3>
-                        <p class="text-xs text-rose-700 mt-0.5">Découvert initial de 700 € en cours de lissage (-200€ en octobre, -500€ en novembre). L'épargne est mise en pause temporaire.</p>
+                        <h2 class="font-bold text-lg text-slate-800">Plan de Redressement & Objectifs Annuels</h2>
+                        <p class="text-xs text-slate-400">Règles socles : Salaire 2 900 € le 25 | Charges fixes 1 888 € | Capacité nette 300 € / mois</p>
                     </div>
                 </div>
-                <div class="text-right bg-white px-4 py-2 rounded-lg border border-rose-100 shadow-2xs w-full sm:w-auto">
-                    <div class="text-[10px] text-slate-400 uppercase font-semibold">Découvert Actuel</div>
-                    <div class="text-lg font-bold text-rose-600">-700,00 €</div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                        <div class="text-xs text-rose-600 font-semibold uppercase tracking-wider">👝 Anniversaires</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">65 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-xs text-slate-500 mt-1">Objectif cible : 770 € / an</div>
+                    </div>
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                        <div class="text-xs text-rose-600 font-semibold uppercase tracking-wider">🎄 Noël</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">35 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-xs text-slate-500 mt-1">Reste à charge : 410 € (après CE 360€)</div>
+                    </div>
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                        <div class="text-xs text-rose-600 font-semibold uppercase tracking-wider">🛡️ Précaution</div>
+                        <div class="text-2xl font-bold text-slate-800 mt-1">200 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
+                        <div class="text-xs text-slate-500 mt-1">Actif dès décembre (2 400 € / an)</div>
+                    </div>
                 </div>
             </section>
 
-            <!-- SECTION : CE QUE JE METS CHAQUE MOIS (Mensualisation) -->
-            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-coins text-indigo-600 mr-2"></i> Ma Mensualisation (Ce qui est prévu chaque mois)</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Répartition de votre effort d'épargne mensuel cible (300 € / mois au total une fois le découvert soldé).</p>
-                </div>
+            <!-- Échéancier Phase par Phase (Timeline) -->
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
+                <h3 class="font-bold text-base text-slate-800 flex items-center">
+                    <i class="fa-solid fa-route text-rose-500 mr-2"></i> Échéancier Chronologique (Octobre 2026 – 2027)
+                </h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <div class="text-xs text-slate-500 uppercase font-semibold">👝 Anniversaires</div>
-                        <div class="text-xl font-bold text-indigo-600 mt-1">65,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
-                        <div class="text-[11px] text-slate-400 mt-1">Objectif annuel : 770 €</div>
+                <div class="space-y-4">
+                    <!-- Phase 1 : Octobre -->
+                    <div class="border-l-4 border-rose-500 bg-rose-50/30 p-4 rounded-r-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-rose-900 text-sm">Octobre 2026 : Gestion des urgences & Lissage</span>
+                            <span class="text-xs bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-medium">En cours</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Encaissement paie (2 900 €) - Fixes (1 888 €) - Perso/Marge (712 €). Remboursement partiel du découvert de <strong>200 €</strong> (reste -500 €) pour financer le shooting photo de Papy & Mamie (100 €) sans asphyxie. Épargne en pause.
+                        </p>
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <div class="text-xs text-slate-500 uppercase font-semibold">🎄 Noël</div>
-                        <div class="text-xl font-bold text-indigo-600 mt-1">35,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
-                        <div class="text-[11px] text-slate-400 mt-1">Reste à charge : 410 € (après CE 360€)</div>
+
+                    <!-- Phase 1 : Novembre -->
+                    <div class="border-l-4 border-pink-400 bg-slate-50 p-4 rounded-r-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-800 text-sm">Novembre 2026 : Clôture du Découvert</span>
+                            <span class="text-xs bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full font-medium">À venir</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Remboursement des <strong>500 €</strong> restants : <strong>le découvert de 700 € est totalement effacé</strong>. Premier versement de 300 € pour Noël.
+                        </p>
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <div class="text-xs text-slate-500 uppercase font-semibold">🛡️ Épargne de Précaution</div>
-                        <div class="text-xl font-bold text-amber-600 mt-1">200,00 € <span class="text-xs font-normal text-slate-500">/ mois</span></div>
-                        <div class="text-[11px] text-slate-400 mt-1">Actif dès décembre (après découvert)</div>
+
+                    <!-- Phase 1 : Décembre -->
+                    <div class="border-l-4 border-amber-400 bg-slate-50 p-4 rounded-r-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-800 text-sm">Décembre 2026 : Fêtes & Subvention CE</span>
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">Échéance clé</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Encaissement de la subvention CE de <strong>360 €</strong> le 10/12. Financement du reste à charge de Noël (410 €) et de l'anniversaire de la Mère (50 €).
+                        </p>
                     </div>
+
+                    <!-- Phase 2 : Janvier 2027 et + -->
+                    <div class="border-l-4 border-emerald-500 bg-emerald-50/30 p-4 rounded-r-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-900 text-sm">Janvier 2027 & au-delà : Régime de Croisière (Phase 2)</span>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium">Plein régime</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Activation complète et durable des <strong>300 € / mois</strong> d'effort d'épargne (65 € Anniversaires + 35 € Noël + 200 € Précaution). Constitution saine du Livret A.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VUE 2 : MES ENVELOPPES & DEAD-LINES -->
+        <div id="view-planificateur" class="hidden space-y-6">
+            
+            <!-- Alerte de Trésorerie & Situation Réelle -->
+            <section class="bg-gradient-to-r from-rose-500 to-pink-500 text-white p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-start space-x-3">
+                    <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm mt-0.5">
+                        <i class="fa-solid fa-triangle-exclamation text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm">Situation de Trésorerie Actuelle</h3>
+                        <p class="text-xs text-rose-100 mt-0.5">Découvert initial de 700 € en cours de lissage (-200€ en octobre, -500€ en novembre).</p>
+                    </div>
+                </div>
+                <div class="text-right bg-white/10 px-4 py-2.5 rounded-xl backdrop-blur-sm border border-white/20 w-full sm:w-auto">
+                    <div class="text-[10px] text-rose-100 uppercase font-semibold">Découvert Actuel</div>
+                    <div class="text-xl font-bold text-white">-700,00 €</div>
                 </div>
             </section>
 
             <!-- SECTION : SUIVI DES ENVELOPPES & DEAD-LINES -->
-            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-3">
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-rose-50 pb-4">
                     <div>
-                        <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-bars-progress text-indigo-600 mr-2"></i> État de mes Enveloppes & Dead-lines</h2>
-                        <p class="text-xs text-slate-400">Cliquez sur une enveloppe pour voir le détail des dead-lines et des personnes.</p>
+                        <h2 class="font-bold text-lg text-slate-800">État de mes Enveloppes & Dead-lines</h2>
+                        <p class="text-xs text-slate-400">Cliquez sur une enveloppe pour voir le détail des dead-lines et des proches.</p>
                     </div>
-                    <div class="flex items-center space-x-1 text-xs">
+                    <div class="flex items-center space-x-1.5 text-xs">
                         <span class="text-slate-400 mr-1">Filtre :</span>
-                        <button type="button" onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">Tous</button>
-                        <button type="button" onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
-                        <button type="button" onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
+                        <button type="button" onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-medium shadow-xs">Tous</button>
+                        <button type="button" onclick="setFilter('TODO')" id="filter-btn-TODO" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">À venir</button>
+                        <button type="button" onclick="setFilter('DONE')" id="filter-btn-DONE" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">Achetés</button>
                     </div>
                 </div>
                 
@@ -106,15 +182,17 @@
             </section>
         </div>
 
-        <!-- VUE 2 : OPÉRATIONS & JOURNAL -->
+        <!-- VUE 3 : OPÉRATIONS & JOURNAL -->
         <div id="view-mouvements" class="hidden space-y-6">
             
-            <section class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 space-y-4">
-                <h2 class="font-bold text-base text-slate-800"><i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Enregistrer une opération</h2>
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
+                <h2 class="font-bold text-lg text-slate-800 flex items-center">
+                    <i class="fa-solid fa-circle-plus text-rose-500 mr-2"></i> Enregistrer une opération
+                </h2>
                 <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
-                        <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-slate-300 rounded p-2 text-sm bg-slate-50">
+                        <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-rose-50/30 focus:outline-rose-500">
                             <option value="CADEAU_ACHETE">Achat Cadeau (Anniversaire / Noël)</option>
                             <option value="REMBOURSEMENT_DECOUVERT">Remboursement Découvert</option>
                             <option value="VIREMENT_LIVRET">Virement Livret A</option>
@@ -123,14 +201,14 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Montant (€)</label>
-                        <input type="number" step="0.01" id="mvt-montant" required class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="0.00">
+                        <input type="number" step="0.01" id="mvt-montant" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="0.00">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
-                        <input type="date" id="mvt-date" required class="w-full border border-slate-300 rounded p-2 text-sm">
+                        <input type="date" id="mvt-date" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500">
                     </div>
 
-                    <div id="cadeau-selection-container" class="sm:col-span-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div id="cadeau-selection-container" class="sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
                         <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) (Dead-lines) :</label>
                         <div id="checkboxes-evenements" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs max-h-40 overflow-y-auto">
                             <!-- Injection dynamique -->
@@ -139,28 +217,28 @@
 
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
-                        <input type="text" id="mvt-commentaire" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Ex: Shooting photo Papy et Mamie">
+                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Shooting photo Papy et Mamie">
                     </div>
                     <div>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm transition shadow-xs font-medium">Enregistrer</button>
+                        <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl text-sm transition shadow-sm font-semibold">Enregistrer</button>
                     </div>
                 </form>
             </section>
 
-            <section class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
-                <div class="p-4 bg-slate-50 font-semibold text-slate-700 border-b border-slate-200 flex justify-between items-center">
+            <section class="bg-white rounded-2xl shadow-sm border border-rose-100 overflow-hidden">
+                <div class="p-5 bg-rose-50/30 font-semibold text-slate-700 border-b border-rose-100 flex justify-between items-center">
                     <span>Historique des mouvements</span>
-                    <button type="button" onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded shadow-xs">Export ChatGPT</button>
+                    <button type="button" onclick="exportJSON()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl shadow-xs font-medium">Export ChatGPT</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-50/50 text-slate-400 text-xs border-b border-slate-100">
-                                <th class="p-3">Date</th>
-                                <th class="p-3">Type</th>
-                                <th class="p-3">Montant</th>
-                                <th class="p-3">Commentaire</th>
-                                <th class="p-3 text-right">Action</th>
+                            <tr class="bg-rose-50/20 text-slate-400 text-xs border-b border-rose-100">
+                                <th class="p-3.5">Date</th>
+                                <th class="p-3.5">Type</th>
+                                <th class="p-3.5">Montant</th>
+                                <th class="p-3.5">Commentaire</th>
+                                <th class="p-3.5 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody id="mouvements-tbody">
@@ -190,7 +268,7 @@
                     renderPlanificateur();
                     if (statusEl) {
                         statusEl.textContent = "À jour";
-                        statusEl.className = "text-xs bg-emerald-600 px-3 py-1 rounded-full text-emerald-100";
+                        statusEl.className = "text-xs bg-white/25 px-3 py-1 rounded-full text-white backdrop-blur-sm";
                     }
                 } else {
                     throw new Error(result.message);
@@ -198,42 +276,39 @@
             } catch (error) {
                 console.error(error);
                 if (statusEl) {
-                    statusEl.textContent = "Erreur de synchro";
-                    statusEl.className = "text-xs bg-rose-600 px-3 py-1 rounded-full text-rose-100";
+                    statusEl.textContent = "Erreur synchro";
+                    statusEl.className = "text-xs bg-rose-800 px-3 py-1 rounded-full text-white";
                 }
             }
         }
 
         function switchView(viewName) {
-            const planifEl = document.getElementById('view-planificateur');
-            const mvtEl = document.getElementById('view-mouvements');
-            const btnPlanif = document.getElementById('btn-view-planificateur');
-            const btnMvt = document.getElementById('btn-view-mouvements');
-
-            if (planifEl) planifEl.classList.add('hidden');
-            if (mvtEl) mvtEl.classList.add('hidden');
-            if (btnPlanif) btnPlanif.className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
-            if (btnMvt) btnMvt.className = "flex-1 py-2 rounded-lg text-center text-slate-500 hover:text-slate-800 transition";
+            const views = ['echeancier', 'planificateur', 'mouvements'];
+            views.forEach(function(v) {
+                const el = document.getElementById('view-' + v);
+                const btn = document.getElementById('btn-view-' + v);
+                if (el) el.classList.add('hidden');
+                if (btn) btn.className = "flex-1 py-2.5 rounded-xl text-center text-slate-500 hover:text-rose-600 transition";
+            });
 
             const targetView = document.getElementById('view-' + viewName);
             const targetBtn = document.getElementById('btn-view-' + viewName);
 
             if (targetView) targetView.classList.remove('hidden');
-            if (targetBtn) targetBtn.className = "flex-1 py-2 rounded-lg text-center bg-indigo-600 text-white transition shadow-xs";
+            if (targetBtn) targetBtn.className = "flex-1 py-2.5 rounded-xl text-center bg-rose-500 text-white transition shadow-sm";
         }
 
         function setFilter(filterType) {
             currentFilter = filterType;
-            const filters = ['ALL', 'TODO', 'DONE'];
-            filters.forEach(function(f) {
+            ['ALL', 'TODO', 'DONE'].forEach(function(f) {
                 const btn = document.getElementById('filter-btn-' + f);
                 if (btn) {
-                    btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200";
+                    btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200";
                 }
             });
             const activeBtn = document.getElementById('filter-btn-' + filterType);
             if (activeBtn) {
-                activeBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium";
+                activeBtn.className = "px-3 py-1.5 rounded-xl bg-rose-500 text-white font-medium shadow-xs";
             }
             renderPlanificateur();
         }
@@ -266,9 +341,9 @@
                     });
 
                     let pourcentage = Math.min(Math.round((totalConsomme / totalCible) * 100), 100);
-                    let barColor = "bg-indigo-600";
+                    let barColor = "bg-rose-500";
                     let statusText = "En cours de provision";
-                    let statusBadgeClass = "bg-indigo-50 text-indigo-700";
+                    let statusBadgeClass = "bg-rose-50 text-rose-700";
 
                     if (totalConsomme > 0 && totalConsomme <= totalCible) {
                         barColor = "bg-amber-500";
@@ -276,9 +351,9 @@
                         statusBadgeClass = "bg-amber-50 text-amber-700";
                     }
                     if (totalConsomme > totalCible) {
-                        barColor = "bg-rose-600";
+                        barColor = "bg-rose-700";
                         statusText = "Dépassement !";
-                        statusBadgeClass = "bg-rose-50 text-rose-700";
+                        statusBadgeClass = "bg-rose-100 text-rose-800";
                     }
 
                     let listItemsHTML = "";
@@ -288,14 +363,14 @@
                             let badgeText = evt.statut === 'ACHETE' ? '✓ Acheté' : 'À provisionner';
                             let montantDep = evt.montant_depense || 0;
                             
-                            listItemsHTML += '<div class="bg-white p-2.5 rounded border border-slate-200 flex justify-between items-center shadow-2xs">' +
+                            listItemsHTML += '<div class="bg-rose-50/30 p-3 rounded-xl border border-rose-100 flex justify-between items-center shadow-2xs">' +
                                 '<div>' +
                                     '<span class="font-bold text-slate-700">' + evt.libelle + '</span>' +
-                                    '<span class="text-rose-600 block text-[10px] font-semibold"><i class="fa-regular fa-calendar mr-1"></i> Échéance : ' + (evt.prochaine_date || 'Bientôt') + '</span>' +
+                                    '<span class="text-rose-500 block text-[11px] font-semibold"><i class="fa-regular fa-calendar mr-1"></i> Échéance : ' + (evt.prochaine_date || 'Bientôt') + '</span>' +
                                 '</div>' +
                                 '<div class="text-right">' +
                                     '<span class="font-semibold text-slate-800 block">' + montantDep + ' € / ' + evt.budget_cible + ' €</span>' +
-                                    '<span class="text-[10px] px-1.5 py-0.5 rounded font-medium ' + badgeClass + '">' + badgeText + '</span>' +
+                                    '<span class="text-[10px] px-2 py-0.5 rounded-full font-medium ' + badgeClass + '">' + badgeText + '</span>' +
                                 '</div>' +
                             '</div>';
                         });
@@ -303,26 +378,26 @@
                         listItemsHTML = '<div class="text-xs text-slate-400 italic text-center py-2">Aucun élément ne correspond au filtre.</div>';
                     }
 
-                    let detailsHTML = '<div id="details-' + env.enveloppe_id + '" class="hidden mt-3 pt-3 border-t border-slate-100 bg-slate-50/80 p-3 rounded-lg space-y-2">' +
-                        '<div class="text-xs font-semibold text-slate-500 mb-2"><i class="fa-solid fa-clock mr-1"></i> Dead-lines & Échéances associées :</div>' +
+                    let detailsHTML = '<div id="details-' + env.enveloppe_id + '" class="hidden mt-3 pt-3 border-t border-rose-100 bg-rose-50/20 p-3 rounded-xl space-y-2">' +
+                        '<div class="text-xs font-semibold text-slate-600 mb-2"><i class="fa-solid fa-clock mr-1 text-rose-500"></i> Dead-lines & Échéances associées :</div>' +
                         '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">' + listItemsHTML + '</div>' +
                     '</div>';
 
-                    container.innerHTML += '<div class="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition bg-white shadow-2xs">' +
+                    container.innerHTML += '<div class="border border-rose-100 rounded-2xl p-5 hover:border-rose-300 transition bg-white shadow-2xs">' +
                         '<div class="flex justify-between items-center cursor-pointer select-none" onclick="toggleDetails(\'details-' + env.enveloppe_id + '\')">' +
-                            '<div class="flex items-center space-x-2">' +
-                                '<i class="fa-solid fa-chevron-right text-slate-400 text-xs transition-transform duration-200" id="icon-details-' + env.enveloppe_id + '"></i>' +
+                            '<div class="flex items-center space-x-3">' +
+                                '<i class="fa-solid fa-chevron-right text-rose-400 text-xs transition-transform duration-200" id="icon-details-' + env.enveloppe_id + '"></i>' +
                                 '<span class="font-bold text-slate-800 text-base">' + env.libelle + '</span>' +
                             '</div>' +
                             '<div class="flex items-center space-x-3">' +
-                                '<span class="text-xs px-2 py-0.5 rounded font-medium ' + statusBadgeClass + '">' + statusText + '</span>' +
+                                '<span class="text-xs px-2.5 py-1 rounded-full font-medium ' + statusBadgeClass + '">' + statusText + '</span>' +
                                 '<span class="font-bold text-slate-700">' + totalConsomme + ' € <span class="text-slate-400 font-normal">/ ' + totalCible + ' €</span></span>' +
                             '</div>' +
                         '</div>' +
-                        '<div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200 mt-3 cursor-pointer" onclick="toggleDetails(\'details-' + env.enveloppe_id + '\')">' +
+                        '<div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-rose-50 mt-3 cursor-pointer" onclick="toggleDetails(\'details-' + env.enveloppe_id + '\')">' +
                             '<div class="' + barColor + ' h-full rounded-full transition-all duration-500" style="width: ' + Math.max(pourcentage, 3) + '%;"></div>' +
                         '</div>' +
-                        '<div class="flex justify-between text-xs text-slate-400 mt-2">' +
+                        '<div class="flex justify-between text-xs text-slate-400 mt-3">' +
                             '<span>Versement mensuel prévu : <strong class="text-slate-700">' + (env.virement_mensuel_cible || 0) + ' € / mois</strong></span>' +
                             '<span>Reste à financer : <strong class="text-slate-700">' + Math.max(totalCible - totalConsomme, 0) + ' €</strong></span>' +
                         '</div>' +
@@ -339,13 +414,13 @@
                 if (appData.mouvements && appData.mouvements.length > 0) {
                     appData.mouvements.forEach(function(mvt) {
                         let montantClass = mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800';
-                        mvtTbody.innerHTML += '<tr class="border-b border-slate-100 hover:bg-slate-50">' +
-                            '<td class="p-3 text-slate-500 text-xs">' + mvt.date + '</td>' +
-                            '<td class="p-3 font-medium text-slate-700 text-xs">' + mvt.type + '</td>' +
-                            '<td class="p-3 font-bold ' + montantClass + ' text-xs">' + mvt.montant + ' €</td>' +
-                            '<td class="p-3 text-slate-600 text-xs">' + (mvt.commentaire || '') + '</td>' +
-                            '<td class="p-3 text-right">' +
-                                '<button type="button" onclick="deleteMouvement(\'' + mvt.mouvement_id + '\')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Supprimer">' +
+                        mvtTbody.innerHTML += '<tr class="border-b border-rose-50 hover:bg-rose-50/20 transition">' +
+                            '<td class="p-3.5 text-slate-500 text-xs">' + mvt.date + '</td>' +
+                            '<td class="p-3.5 font-medium text-slate-700 text-xs">' + mvt.type + '</td>' +
+                            '<td class="p-3.5 font-bold ' + montantClass + ' text-xs">' + mvt.montant + ' €</td>' +
+                            '<td class="p-3.5 text-slate-600 text-xs">' + (mvt.commentaire || '') + '</td>' +
+                            '<td class="p-3.5 text-right">' +
+                                '<button type="button" onclick="deleteMouvement(\'' + mvt.mouvement_id + '\')" class="text-rose-400 hover:text-rose-600 text-xs p-1.5 rounded-lg hover:bg-rose-50 transition" title="Supprimer">' +
                                     '<i class="fa-solid fa-trash"></i>' +
                                 '</button>' +
                             '</td>' +
@@ -390,9 +465,9 @@
             cbContainer.innerHTML = '';
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
-                    cbContainer.innerHTML += '<label class="flex items-center space-x-2 cursor-pointer bg-white p-2 rounded border border-slate-200 hover:border-indigo-300">' +
-                        '<input type="checkbox" name="selected_events" value="' + evt.evenement_id + '" class="rounded text-indigo-600">' +
-                        '<span class="truncate"><b>' + evt.libelle + '</b> <span class="text-slate-400">(' + (evt.prochaine_date || 'Date non fixée') + ' - ' + evt.budget_cible + '€)</span></span>' +
+                    cbContainer.innerHTML += '<label class="flex items-center space-x-2.5 cursor-pointer bg-white p-2.5 rounded-xl border border-rose-100 hover:border-rose-300 transition">' +
+                        '<input type="checkbox" name="selected_events" value="' + evt.evenement_id + '" class="rounded text-rose-500 focus:ring-rose-400">' +
+                        '<span class="truncate"><b>' + evt.libelle + '</b> <span class="text-slate-400 text-[11px]">(' + (evt.prochaine_date || 'Date non fixée') + ' - ' + evt.budget_cible + '€)</span></span>' +
                     '</label>';
                 });
             }
