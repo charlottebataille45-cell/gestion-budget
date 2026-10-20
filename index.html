@@ -55,8 +55,6 @@
 
         <!-- VUE 1 : ÉCHÉANCIER & FLUX RÉELS -->
         <div id="view-echeancier" class="space-y-6">
-            
-            <!-- Alerte spécifique Matys (5 janvier) -->
             <section class="bg-gradient-to-r from-amber-500 to-rose-500 text-white p-5 rounded-2xl shadow-sm flex items-start space-x-3">
                 <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm mt-0.5">
                     <i class="fa-solid fa-triangle-exclamation text-xl"></i>
@@ -69,12 +67,10 @@
                 </div>
             </section>
 
-            <!-- Échéancier chronologique -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <h3 class="font-bold text-base text-slate-800 flex items-center">
                     <i class="fa-solid fa-route text-rose-500 mr-2"></i> Feuillets de Trésorerie & Arbitrages
                 </h3>
-
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -97,7 +93,6 @@
 
         <!-- VUE 2 : MES ENVELOPPES & PERSONNES -->
         <div id="view-planificateur" class="hidden space-y-6">
-            
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-rose-50 pb-4">
                     <div>
@@ -120,46 +115,72 @@
         <!-- VUE 3 : OPÉRATIONS & JOURNAL -->
         <div id="view-mouvements" class="hidden space-y-6">
             
+            <!-- FORMULAIRE DE SAISIE -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
                 <h2 class="font-bold text-lg text-slate-800 flex items-center">
                     <i class="fa-solid fa-circle-plus text-rose-500 mr-2"></i> Enregistrer une opération
                 </h2>
                 <form id="mouvement-form" onsubmit="submitMouvement(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Type d'opération</label>
                         <select id="mvt-type" onchange="handleTypeChange()" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-rose-50/30 focus:outline-rose-500">
-                            <option value="CADEAU_ACHETE">Achat Cadeau (Anniversaire / Noël)</option>
-                            <option value="REMBOURSEMENT_DECOUVERT">Remboursement Découvert</option>
-                            <option value="VIREMENT_LIVRET">Virement Livret A</option>
-                            <option value="DEPENSE_FIXE">Dépense Fixe</option>
+                            <option value="CADEAU_ACHETE">🛍️ Achat Cadeau</option>
+                            <option value="ALIMENTATION_ENVELOPPE">📥 Alimenter une Enveloppe</option>
+                            <option value="REMBOURSEMENT_DECOUVERT">🏦 Remboursement Découvert</option>
+                            <option value="VIREMENT_LIVRET">🛡️ Virement Livret A</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Montant (€)</label>
                         <input type="number" step="0.01" id="mvt-montant" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="0.00">
                     </div>
+
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
                         <input type="date" id="mvt-date" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500">
                     </div>
 
-                    <div id="cadeau-selection-container" class="sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
-                        <label class="block text-xs font-semibold text-slate-700 mb-2">Bénéficiaire(s) concerné(s) :</label>
-                        <div id="checkboxes-evenements" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs max-h-48 overflow-y-auto">
-                            <!-- Injection dynamique -->
+                    <!-- BLOC CADRE CADEAU (Achat Cadeau) -->
+                    <div id="block-cadeau" class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catégorie Cadeau :</label>
+                            <select id="cadeau-categorie" onchange="filterPersonnesByCat()" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
+                                <option value="NOEL">🎄 Noël</option>
+                                <option value="ANNIVERSAIRE">🎂 Anniversaire</option>
+                            </select>
                         </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Bénéficiaire :</label>
+                            <select id="cadeau-personne" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
+                                <!-- Rempli dynamiquement -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- BLOC ENVELOPPE (Alimenter une enveloppe) -->
+                    <div id="block-enveloppe" class="hidden sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Choisir l'enveloppe à créditer :</label>
+                        <select id="enveloppe-cible" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
+                            <option value="anniversaires">👝 Anniversaires (65 €/mois)</option>
+                            <option value="noel">🎄 Noël (35 €/mois)</option>
+                            <option value="precaution">🛡️ Épargne de Précaution (200 €/mois)</option>
+                        </select>
                     </div>
 
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
-                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou Acompte Noël">
+                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou virement de paie">
                     </div>
+
                     <div>
-                        <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl text-sm transition shadow-sm font-semibold">Enregistrer</button>
+                        <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl text-sm transition shadow-sm font-semibold">Enregistrer l'opération</button>
                     </div>
                 </form>
             </section>
 
+            <!-- HISTORIQUE ET ÉDITION -->
             <section class="bg-white rounded-2xl shadow-sm border border-rose-100 overflow-hidden">
                 <div class="p-5 bg-rose-50/30 font-semibold text-slate-700 border-b border-rose-100 flex justify-between items-center">
                     <span>Historique des mouvements</span>
@@ -173,7 +194,7 @@
                                 <th class="p-3.5">Type</th>
                                 <th class="p-3.5">Montant</th>
                                 <th class="p-3.5">Commentaire</th>
-                                <th class="p-3.5 text-right">Action</th>
+                                <th class="p-3.5 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="mouvements-tbody">
@@ -218,8 +239,7 @@
         }
 
         function switchView(viewName) {
-            const views = ['echeancier', 'planificateur', 'mouvements'];
-            views.forEach(function(v) {
+            ['echeancier', 'planificateur', 'mouvements'].forEach(function(v) {
                 const el = document.getElementById('view-' + v);
                 const btn = document.getElementById('btn-view-' + v);
                 if (el) el.classList.add('hidden');
@@ -248,7 +268,7 @@
             renderTresorerie();
             renderEvenements();
             renderMouvements();
-            renderCadeauxCheckboxes();
+            filterPersonnesByCat();
         }
 
         function renderTresorerie() {
@@ -308,6 +328,38 @@
             }
         }
 
+        function handleTypeChange() {
+            const type = document.getElementById('mvt-type').value;
+            const blockCadeau = document.getElementById('block-cadeau');
+            const blockEnveloppe = document.getElementById('block-enveloppe');
+
+            if (type === 'CADEAU_ACHETE') {
+                blockCadeau.classList.remove('hidden');
+                blockEnveloppe.classList.add('hidden');
+            } else if (type === 'ALIMENTATION_ENVELOPPE') {
+                blockCadeau.classList.add('hidden');
+                blockEnveloppe.classList.remove('hidden');
+            } else {
+                blockCadeau.classList.add('hidden');
+                blockEnveloppe.classList.add('hidden');
+            }
+        }
+
+        function filterPersonnesByCat() {
+            const cat = document.getElementById('cadeau-categorie').value;
+            const personneSel = document.getElementById('cadeau-personne');
+            if (!personneSel) return;
+            personneSel.innerHTML = "";
+
+            if (appData.evenements) {
+                appData.evenements.forEach(function(evt) {
+                    if (evt.type_evenement === cat) {
+                        personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + (evt.libelle || evt.evenement_id) + ' (' + evt.budget_cible + ' €)</option>';
+                    }
+                });
+            }
+        }
+
         function renderMouvements() {
             const mvtTbody = document.getElementById('mouvements-tbody');
             if (!mvtTbody) return;
@@ -320,7 +372,10 @@
                         '<td class="p-3.5 font-medium text-slate-700 text-xs">' + mvt.type + '</td>' +
                         '<td class="p-3.5 font-bold ' + montantClass + ' text-xs">' + mvt.montant + ' €</td>' +
                         '<td class="p-3.5 text-slate-600 text-xs">' + (mvt.commentaire || '') + '</td>' +
-                        '<td class="p-3.5 text-right">' +
+                        '<td class="p-3.5 text-right space-x-1">' +
+                            '<button type="button" onclick="editMouvement(\'' + mvt.mouvement_id + '\')" class="text-indigo-400 hover:text-indigo-600 text-xs p-1.5 rounded-lg hover:bg-indigo-50 transition" title="Modifier">' +
+                                '<i class="fa-solid fa-pen"></i>' +
+                            '</button>' +
                             '<button type="button" onclick="deleteMouvement(\'' + mvt.mouvement_id + '\')" class="text-rose-400 hover:text-rose-600 text-xs p-1.5 rounded-lg hover:bg-rose-50 transition" title="Supprimer">' +
                                 '<i class="fa-solid fa-trash"></i>' +
                             '</button>' +
@@ -332,51 +387,24 @@
             }
         }
 
-        function renderCadeauxCheckboxes() {
-            const cbContainer = document.getElementById('checkboxes-evenements');
-            if (!cbContainer) return;
-            cbContainer.innerHTML = '';
-            if (appData.evenements) {
-                appData.evenements.forEach(function(evt) {
-                    cbContainer.innerHTML += '<label class="flex items-center space-x-2.5 cursor-pointer bg-white p-2 rounded-xl border border-rose-100 hover:border-rose-300 transition">' +
-                        '<input type="checkbox" name="selected_events" value="' + evt.evenement_id + '" class="rounded text-rose-500 focus:ring-rose-400">' +
-                        '<span class="truncate"><b>' + (evt.libelle || evt.evenement_id) + '</b> <span class="text-slate-400 text-[10px]">(' + evt.prochaine_date + ' - ' + evt.budget_cible + '€)</span></span>' +
-                    '</label>';
-                });
-            }
-        }
-
-        function handleTypeChange() {
-            const typeSel = document.getElementById('mvt-type');
-            const container = document.getElementById('cadeau-selection-container');
-            if (typeSel && container) {
-                if (typeSel.value === 'CADEAU_ACHETE') container.classList.remove('hidden');
-                else container.classList.add('hidden');
-            }
-        }
-
         async function submitMouvement(event) {
             event.preventDefault();
-            let selectedEvents = [];
-            const typeSel = document.getElementById('mvt-type');
-            const type = typeSel ? typeSel.value : '';
-            
-            if (type === 'CADEAU_ACHETE') {
-                const checkboxes = document.querySelectorAll('input[name="selected_events"]:checked');
-                checkboxes.forEach(function(cb) { selectedEvents.push(cb.value); });
-            }
+            const type = document.getElementById('mvt-type').value;
+            let targetEvts = [];
 
-            const montantInput = document.getElementById('mvt-montant');
-            const dateInput = document.getElementById('mvt-date');
-            const commInput = document.getElementById('mvt-commentaire');
+            if (type === 'CADEAU_ACHETE') {
+                targetEvts.push(document.getElementById('cadeau-personne').value);
+            } else if (type === 'ALIMENTATION_ENVELOPPE') {
+                targetEvts.push(document.getElementById('enveloppe-cible').value);
+            }
 
             const mvt = {
                 mouvement_id: "mvt_" + Date.now(),
                 type: type,
-                montant: montantInput ? parseFloat(montantInput.value) : 0,
-                date: dateInput ? dateInput.value : '',
-                commentaire: commInput ? commInput.value : '',
-                evenement_ids: selectedEvents
+                montant: parseFloat(document.getElementById('mvt-montant').value) || 0,
+                date: document.getElementById('mvt-date').value,
+                commentaire: document.getElementById('mvt-commentaire').value,
+                evenement_ids: targetEvts
             };
 
             try {
@@ -386,10 +414,8 @@
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    const form = document.getElementById('mouvement-form');
-                    if (form) form.reset();
-                    const container = document.getElementById('cadeau-selection-container');
-                    if (container) container.classList.add('hidden');
+                    document.getElementById('mouvement-form').reset();
+                    handleTypeChange();
                     loadData();
                 } else {
                     alert("Erreur : " + result.message);
@@ -399,8 +425,21 @@
             }
         }
 
-        async function deleteMouvement(mvtId) {
-            if (!confirm("Voulez-vous supprimer cette opération ?")) return;
+        function editMouvement(mvtId) {
+            const mvt = appData.mouvements.find(m => m.mouvement_id === mvtId);
+            if (!mvt) return;
+            
+            document.getElementById('mvt-type').value = mvt.type;
+            handleTypeChange();
+            document.getElementById('mvt-montant').value = mvt.montant;
+            document.getElementById('mvt-date').value = mvt.date;
+            document.getElementById('mvt-commentaire').value = mvt.commentaire || '';
+            
+            deleteMouvement(mvtId, false);
+        }
+
+        async function deleteMouvement(mvtId, confirmReq = true) {
+            if (confirmReq && !confirm("Voulez-vous supprimer cette opération ?")) return;
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
