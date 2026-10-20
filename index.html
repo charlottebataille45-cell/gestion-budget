@@ -297,13 +297,16 @@
                     let decouvertFinVal = parseFloat(String(row.solde_decouvert_fin || "0").replace("€", "").replace(/\s/g, "")) || 0;
                     let statusDecouvertClass = decouvertFinVal < 0 ? "text-rose-600 font-bold" : "text-emerald-600 font-bold";
         
-                    // Formatage propre et intelligent de la période (gère les dates ISO et le texte brut)
-                    let periodeClean = row.periode;
-                    if (periodeClean) {
-                        let dateTest = new Date(periodeClean);
-                        // Si c'est une date valide au format ISO/technique
-                        if (!isNaN(dateTest.getTime()) && String(periodeClean).includes('T')) {
-                            let moisAnnee = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(dateTest);
+                    // Nettoyage et formatage propre de la période (Suppression définitive de l'heure)
+                    let periodeClean = String(row.periode || "").trim();
+                    
+                    // Si la valeur est au format date ISO (ex: 2026-10-24T22:00:00.000Z)
+                    if (periodeClean.includes('T') && periodeClean.includes('Z')) {
+                        let dateObj = new Date(periodeClean);
+                        if (!isNaN(dateObj.getTime())) {
+                            // Utilisation de l'UTC pour éviter le décalage de fuseau horaire de la veille au soir
+                            let options = { month: 'long', year: 'numeric', timeZone: 'UTC' };
+                            let moisAnnee = new Intl.DateTimeFormat('fr-FR', options).format(dateObj);
                             periodeClean = moisAnnee.charAt(0).toUpperCase() + moisAnnee.slice(1);
                         }
                     }
@@ -370,6 +373,7 @@
                 container.innerHTML = '<div class="text-center text-slate-400 text-xs py-6">Aucun suivi de trésorerie disponible.</div>';
             }
         }
+        
         function renderEnveloppesSummary() {
             const container = document.getElementById('envelopes-summary-grid');
             if (!container) return;
