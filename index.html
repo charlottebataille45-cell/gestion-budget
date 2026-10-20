@@ -55,9 +55,7 @@
 
         <!-- VUE 1 : ÉCHÉANCIER & FLUX RÉELS -->
         <div id="view-echeancier" class="space-y-6">
-            <div id="alertes-container" class="space-y-3">
-                <!-- Injection dynamique depuis ALERTES -->
-            </div>
+            <div id="alertes-container" class="space-y-3"></div>
 
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <h3 class="font-bold text-base text-slate-800 flex items-center">
@@ -75,9 +73,7 @@
                                 <th class="p-3">Analyse & Arbitrage Réel</th>
                             </tr>
                         </thead>
-                        <tbody id="tresorerie-tbody">
-                            <!-- Injection dynamique -->
-                        </tbody>
+                        <tbody id="tresorerie-tbody"></tbody>
                     </table>
                 </div>
             </section>
@@ -87,9 +83,7 @@
         <div id="view-planificateur" class="hidden space-y-6">
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
                 <h2 class="font-bold text-lg text-slate-800 border-b border-rose-50 pb-3">État Général des Enveloppes</h2>
-                <div id="envelopes-summary-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- Injection dynamique -->
-                </div>
+                <div id="envelopes-summary-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
             </section>
 
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
@@ -105,9 +99,7 @@
                     </div>
                 </div>
                 
-                <div id="evenements-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Injection dynamique -->
-                </div>
+                <div id="evenements-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
             </section>
         </div>
 
@@ -194,9 +186,7 @@
                                 <th class="p-3.5 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="mouvements-tbody">
-                            <!-- Injection dynamique -->
-                        </tbody>
+                        <tbody id="mouvements-tbody"></tbody>
                     </table>
                 </div>
             </section>
@@ -340,19 +330,12 @@
             if (appData.evenements && appData.evenements.length > 0) {
                 let count = 0;
                 appData.evenements.forEach(function(evt) {
-                    // Analyse universelle du type d'événement dans l'objet
-                    let evtType = "";
-                    for (let key in evt) {
-                        let val = String(evt[key] || "").trim().toUpperCase();
-                        if (val === "NOEL" || val.includes("NOEL")) { evtType = "NOEL"; break; }
-                        if (val === "ANNIVERSAIRE" || val.includes("ANNIV")) { evtType = "ANNIVERSAIRE"; break; }
-                    }
-
-                    let filterType = String(currentFilter || "").trim().toUpperCase();
+                    let evtType = String(evt.type_evenement || '').trim().toUpperCase();
+                    let filterType = String(currentFilter || '').trim().toUpperCase();
 
                     if (filterType !== 'ALL') {
-                        if (filterType === 'NOEL' && evtType !== 'NOEL') return;
-                        if (filterType === 'ANNIVERSAIRE' && evtType !== 'ANNIVERSAIRE') return;
+                        if (filterType === 'NOEL' && !evtType.includes('NOEL')) return;
+                        if (filterType === 'ANNIVERSAIRE' && !evtType.includes('ANNIV')) return;
                     }
 
                     count++;
@@ -406,6 +389,7 @@
             if (type === 'CADEAU_ACHETE') {
                 blockCadeau.classList.remove('hidden');
                 blockEnveloppe.classList.add('hidden');
+                filterPersonnesByCat(); // 👈 Correction : peuple la liste des bénéficiaires à l'affichage du bloc
             } else if (type === 'ALIMENTATION_ENVELOPPE') {
                 blockCadeau.classList.add('hidden');
                 blockEnveloppe.classList.remove('hidden');
@@ -423,13 +407,8 @@
 
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
-                    let evtType = "";
-                    for (let key in evt) {
-                        let val = String(evt[key] || "").trim().toUpperCase();
-                        if (val === "NOEL" || val.includes("NOEL")) { evtType = "NOEL"; break; }
-                        if (val === "ANNIVERSAIRE" || val.includes("ANNIV")) { evtType = "ANNIVERSAIRE"; break; }
-                    }
-                    if (evtType === cat) {
+                    let evtType = String(evt.type_evenement || '').toUpperCase().trim();
+                    if ((cat === 'NOEL' && evtType.includes('NOEL')) || (cat === 'ANNIVERSAIRE' && evtType.includes('ANNIV'))) {
                         personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + (evt.libelle || evt.evenement_id) + ' (' + evt.budget_cible + ' €)</option>';
                     }
                 });
