@@ -23,7 +23,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Mon Planificateur Serein</h1>
-                    <p class="text-xs text-rose-100">Suivi Rigoureux, Échéancier & Flux Réels</p>
+                    <p class="text-xs text-rose-100">Pilotage, Échéancier & Enveloppes</p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
@@ -55,17 +55,11 @@
 
         <!-- VUE 1 : ÉCHÉANCIER & FLUX RÉELS -->
         <div id="view-echeancier" class="space-y-6">
-            <section class="bg-gradient-to-r from-amber-500 to-rose-500 text-white p-5 rounded-2xl shadow-sm flex items-start space-x-3">
-                <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm mt-0.5">
-                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-sm">Vigilance Trésorerie : Anniversaire de Matys (5 Janvier)</h3>
-                    <p class="text-xs text-rose-100 mt-1 leading-relaxed">
-                        Le salaire étant versé le 25 du mois, l'anniversaire de Matys (100 €) tombe <strong>avant la paie de janvier</strong>. Son budget doit obligatoirement être pré-provisionné sur la paie du 25 décembre !
-                    </p>
-                </div>
-            </section>
+            
+            <!-- Zone dynamique des alertes issues du Sheet -->
+            <div id="alertes-container" class="space-y-3">
+                <!-- Injection dynamique des alertes depuis la feuille ALERTES -->
+            </div>
 
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <h3 class="font-bold text-base text-slate-800 flex items-center">
@@ -93,16 +87,26 @@
 
         <!-- VUE 2 : MES ENVELOPPES & PERSONNES -->
         <div id="view-planificateur" class="hidden space-y-6">
+            
+            <!-- Résumé des enveloppes virtuelles -->
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
+                <h2 class="font-bold text-lg text-slate-800 border-b border-rose-50 pb-3">État Général des Enveloppes</h2>
+                <div id="envelopes-summary-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Injection dynamique -->
+                </div>
+            </section>
+
+            <!-- Événements filtrables par Proche -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-rose-50 pb-4">
                     <div>
-                        <h2 class="font-bold text-lg text-slate-800">Suivi détaillé par Proche & Dead-line</h2>
-                        <p class="text-xs text-slate-400">Piliers : Budget prévu | Versé | Dépensé | Reste à financer</p>
+                        <h2 class="font-bold text-lg text-slate-800">Suivi par Personne & Échéance</h2>
+                        <p class="text-xs text-slate-400">Détail des cibles, versements et dépenses réelles</p>
                     </div>
                     <div class="flex items-center space-x-1.5 text-xs">
                         <button type="button" onclick="setFilter('ALL')" id="filter-btn-ALL" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-medium shadow-xs">Tous</button>
-                        <button type="button" onclick="setFilter('NOEL')" id="filter-btn-NOEL" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">Noël</button>
-                        <button type="button" onclick="setFilter('ANNIVERSAIRE')" id="filter-btn-ANNIVERSAIRE" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">Anniversaires</button>
+                        <button type="button" onclick="setFilter('NOEL')" id="filter-btn-NOEL" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">🎄 Noël</button>
+                        <button type="button" onclick="setFilter('ANNIVERSAIRE')" id="filter-btn-ANNIVERSAIRE" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200">🎂 Anniversaires</button>
                     </div>
                 </div>
                 
@@ -115,7 +119,6 @@
         <!-- VUE 3 : OPÉRATIONS & JOURNAL -->
         <div id="view-mouvements" class="hidden space-y-6">
             
-            <!-- FORMULAIRE DE SAISIE -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
                 <h2 class="font-bold text-lg text-slate-800 flex items-center">
                     <i class="fa-solid fa-circle-plus text-rose-500 mr-2"></i> Enregistrer une opération
@@ -142,10 +145,10 @@
                         <input type="date" id="mvt-date" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500">
                     </div>
 
-                    <!-- BLOC CADRE CADEAU (Achat Cadeau) -->
+                    <!-- BLOC CADRE CADEAU (Choix Catégorie -> Personne) -->
                     <div id="block-cadeau" class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catégorie Cadeau :</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Type d'événement :</label>
                             <select id="cadeau-categorie" onchange="filterPersonnesByCat()" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
                                 <option value="NOEL">🎄 Noël</option>
                                 <option value="ANNIVERSAIRE">🎂 Anniversaire</option>
@@ -159,7 +162,7 @@
                         </div>
                     </div>
 
-                    <!-- BLOC ENVELOPPE (Alimenter une enveloppe) -->
+                    <!-- BLOC ENVELOPPE -->
                     <div id="block-enveloppe" class="hidden sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Choisir l'enveloppe à créditer :</label>
                         <select id="enveloppe-cible" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
@@ -171,7 +174,7 @@
 
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
-                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou virement de paie">
+                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou Acompte Noël">
                     </div>
 
                     <div>
@@ -180,7 +183,6 @@
                 </form>
             </section>
 
-            <!-- HISTORIQUE ET ÉDITION -->
             <section class="bg-white rounded-2xl shadow-sm border border-rose-100 overflow-hidden">
                 <div class="p-5 bg-rose-50/30 font-semibold text-slate-700 border-b border-rose-100 flex justify-between items-center">
                     <span>Historique des mouvements</span>
@@ -265,10 +267,35 @@
         }
 
         function renderAll() {
+            renderAlertes();
             renderTresorerie();
+            renderEnveloppesSummary();
             renderEvenements();
             renderMouvements();
             filterPersonnesByCat();
+        }
+
+        function renderAlertes() {
+            const container = document.getElementById('alertes-container');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (appData.alertes && appData.alertes.length > 0) {
+                appData.alertes.forEach(function(alt) {
+                    if (!alt.actif) return;
+                    let bgClass = "bg-rose-500 text-white";
+                    if (alt.niveau_severite === "CRITIQUE") bgClass = "bg-gradient-to-r from-amber-500 to-rose-500 text-white";
+                    else if (alt.niveau_severite === "INFO") bgClass = "bg-gradient-to-r from-blue-500 to-indigo-500 text-white";
+
+                    container.innerHTML += '<div class="' + bgClass + ' p-4 rounded-2xl shadow-sm flex items-start space-x-3">' +
+                        '<div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm mt-0.5"><i class="fa-solid fa-bell text-lg"></i></div>' +
+                        '<div>' +
+                            '<h4 class="font-bold text-sm">' + alt.titre + '</h4>' +
+                            '<p class="text-xs text-white/90 mt-1 leading-relaxed">' + alt.message + '</p>' +
+                        '</div>' +
+                    '</div>';
+                });
+            }
         }
 
         function renderTresorerie() {
@@ -290,6 +317,26 @@
             }
         }
 
+        function renderEnveloppesSummary() {
+            const container = document.getElementById('envelopes-summary-grid');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (appData.enveloppes && appData.enveloppes.length > 0) {
+                appData.enveloppes.forEach(function(env) {
+                    let totalCible = env.budget_annuel_cible || 0;
+                    let totalVerse = env.total_verse || 0;
+                    let resteAFinancer = Math.max(totalCible - totalVerse, 0);
+
+                    container.innerHTML += '<div class="bg-rose-50/30 p-4 rounded-xl border border-rose-100 space-y-1">' +
+                        '<div class="text-xs font-bold text-rose-600 uppercase tracking-wider">' + env.libelle + '</div>' +
+                        '<div class="text-xl font-bold text-slate-800">' + totalVerse + ' € <span class="text-xs font-normal text-slate-400">/ ' + totalCible + ' €</span></div>' +
+                        '<div class="text-[11px] text-slate-500">Reste à verser : <strong class="text-rose-600">' + resteAFinancer + ' €</strong></div>' +
+                    '</div>';
+                });
+            }
+        }
+
         function renderEvenements() {
             const container = document.getElementById('evenements-grid');
             if (!container) return;
@@ -299,15 +346,14 @@
                 appData.evenements.forEach(function(evt) {
                     if (currentFilter !== 'ALL' && evt.type_evenement !== currentFilter) return;
 
-                    let budgetPrevu = evt.budget_cible || 0;
-                    let montantVerse = evt.montant_provisionne || 0;
-                    let montantDepense = evt.montant_depense || 0;
+                    let budgetPrevu = parseFloat(evt.budget_cible) || 0;
+                    let montantVerse = parseFloat(evt.montant_provisionne) || 0;
+                    let montantDepense = parseFloat(evt.montant_depense) || 0;
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
 
-                    let isMatysAlert = (evt.evenement_id === 'anniv_matys');
                     let badgeColor = evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
 
-                    container.innerHTML += '<div class="bg-white p-4 rounded-2xl border ' + (isMatysAlert ? 'border-amber-300 bg-amber-50/10' : 'border-rose-100') + ' shadow-2xs space-y-3">' +
+                    container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-2xs space-y-3">' +
                         '<div class="flex justify-between items-start">' +
                             '<div>' +
                                 '<span class="font-bold text-slate-800 text-sm">' + (evt.libelle || evt.evenement_id) + '</span>' +
@@ -317,12 +363,11 @@
                         '</div>' +
 
                         '<div class="grid grid-cols-4 gap-1 text-center bg-rose-50/30 p-2 rounded-xl text-[11px]">' +
-                            '<div><span class="block text-slate-400">Prévu</span><strong class="text-slate-700">' + budgetPrevu + '€</strong></div>' +
+                            '<div><span class="block text-slate-400">Budget</span><strong class="text-slate-700">' + budgetPrevu + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantVerse + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Dépensé</span><strong class="text-slate-700">' + montantDepense + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Reste</span><strong class="text-rose-600">' + resteAFinancer + '€</strong></div>' +
                         '</div>' +
-                        (isMatysAlert ? '<div class="text-[10px] text-amber-700 font-semibold">⚠️ Pré-paie : à financer avant le 05/01.</div>' : '') +
                     '</div>';
                 });
             }
@@ -354,7 +399,7 @@
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
                     if (evt.type_evenement === cat) {
-                        personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + (evt.libelle || evt.evenement_id) + ' (' + evt.budget_cible + ' €)</option>';
+                        personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + evt.libelle + ' (' + evt.budget_cible + ' €)</option>';
                     }
                 });
             }
@@ -369,13 +414,10 @@
                     let montantClass = mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800';
                     mvtTbody.innerHTML += '<tr class="border-b border-rose-50 hover:bg-rose-50/20 transition">' +
                         '<td class="p-3.5 text-slate-500 text-xs">' + mvt.date + '</td>' +
-                        '<td class="p-3.5 font-medium text-slate-700 text-xs">' + mvt.type + '</td>' +
+                        '<td class="p-3.5 font-medium text-slate-700 text-xs">' + mvt.type_operation + '</td>' +
                         '<td class="p-3.5 font-bold ' + montantClass + ' text-xs">' + mvt.montant + ' €</td>' +
                         '<td class="p-3.5 text-slate-600 text-xs">' + (mvt.commentaire || '') + '</td>' +
                         '<td class="p-3.5 text-right space-x-1">' +
-                            '<button type="button" onclick="editMouvement(\'' + mvt.mouvement_id + '\')" class="text-indigo-400 hover:text-indigo-600 text-xs p-1.5 rounded-lg hover:bg-indigo-50 transition" title="Modifier">' +
-                                '<i class="fa-solid fa-pen"></i>' +
-                            '</button>' +
                             '<button type="button" onclick="deleteMouvement(\'' + mvt.mouvement_id + '\')" class="text-rose-400 hover:text-rose-600 text-xs p-1.5 rounded-lg hover:bg-rose-50 transition" title="Supprimer">' +
                                 '<i class="fa-solid fa-trash"></i>' +
                             '</button>' +
@@ -390,12 +432,12 @@
         async function submitMouvement(event) {
             event.preventDefault();
             const type = document.getElementById('mvt-type').value;
-            let targetEvts = [];
+            let cibleId = "";
 
             if (type === 'CADEAU_ACHETE') {
-                targetEvts.push(document.getElementById('cadeau-personne').value);
+                cibleId = document.getElementById('cadeau-personne').value;
             } else if (type === 'ALIMENTATION_ENVELOPPE') {
-                targetEvts.push(document.getElementById('enveloppe-cible').value);
+                cibleId = document.getElementById('enveloppe-cible').value;
             }
 
             const mvt = {
@@ -404,7 +446,7 @@
                 montant: parseFloat(document.getElementById('mvt-montant').value) || 0,
                 date: document.getElementById('mvt-date').value,
                 commentaire: document.getElementById('mvt-commentaire').value,
-                evenement_ids: targetEvts
+                cible_id: cibleId
             };
 
             try {
@@ -425,21 +467,8 @@
             }
         }
 
-        function editMouvement(mvtId) {
-            const mvt = appData.mouvements.find(m => m.mouvement_id === mvtId);
-            if (!mvt) return;
-            
-            document.getElementById('mvt-type').value = mvt.type;
-            handleTypeChange();
-            document.getElementById('mvt-montant').value = mvt.montant;
-            document.getElementById('mvt-date').value = mvt.date;
-            document.getElementById('mvt-commentaire').value = mvt.commentaire || '';
-            
-            deleteMouvement(mvtId, false);
-        }
-
-        async function deleteMouvement(mvtId, confirmReq = true) {
-            if (confirmReq && !confirm("Voulez-vous supprimer cette opération ?")) return;
+        async function deleteMouvement(mvtId) {
+            if (!confirm("Voulez-vous supprimer cette opération ?")) return;
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
