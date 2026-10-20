@@ -55,26 +55,21 @@
 
         <!-- VUE 1 : ÉCHÉANCIER & FLUX RÉELS -->
         <div id="view-echeancier" class="space-y-6">
-            <div id="alertes-container" class="space-y-3"></div>
-
+            <div id="alertes-container" class="space-y-3">
+                <!-- Injection dynamique depuis ALERTES -->
+            </div>
+        
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
-                <h3 class="font-bold text-base text-slate-800 flex items-center">
-                    <i class="fa-solid fa-route text-rose-500 mr-2"></i> Feuillets de Trésorerie & Arbitrages
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-rose-50/50 text-slate-500 font-bold border-b border-rose-100">
-                                <th class="p-3">Période</th>
-                                <th class="p-3">Découvert Début</th>
-                                <th class="p-3">Action Découvert</th>
-                                <th class="p-3">Affectations Cadeaux / Épargne</th>
-                                <th class="p-3">Découvert Fin</th>
-                                <th class="p-3">Analyse & Arbitrage Réel</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tresorerie-tbody"></tbody>
-                    </table>
+                <div class="flex items-center justify-between border-b border-rose-50 pb-4">
+                    <h3 class="font-bold text-base text-slate-800 flex items-center">
+                        <i class="fa-solid fa-route text-rose-500 mr-2"></i> Feuillets de Trésorerie & Arbitrages
+                    </h3>
+                    <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1 rounded-full font-semibold">Vue Chronologique</span>
+                </div>
+                
+                <!-- Conteneur Timeline / Cartes UI-Friendly -->
+                <div id="tresorerie-timeline" class="space-y-4">
+                    <!-- Injection dynamique -->
                 </div>
             </section>
         </div>
@@ -285,21 +280,83 @@
         }
 
         function renderTresorerie() {
-            const tbody = document.getElementById('tresorerie-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = "";
-
+            const container = document.getElementById('tresorerie-timeline');
+            if (!container) return;
+            container.innerHTML = "";
+        
             if (appData.suivi_tresorerie && appData.suivi_tresorerie.length > 0) {
                 appData.suivi_tresorerie.forEach(function(row) {
-                    tbody.innerHTML += '<tr class="border-b border-rose-50 hover:bg-rose-50/20 transition">' +
-                        '<td class="p-3 font-bold text-slate-800">' + row.periode + '</td>' +
-                        '<td class="p-3 text-rose-600 font-semibold">' + row.solde_decouvert_debut + ' €</td>' +
-                        '<td class="p-3 text-slate-700">' + row.action_decouvert + '</td>' +
-                        '<td class="p-3 text-slate-700">' + row.affectations_cadeaux_epargne + '</td>' +
-                        '<td class="p-3 font-bold ' + (row.solde_decouvert_fin < 0 ? 'text-rose-600' : 'text-emerald-600') + '">' + row.solde_decouvert_fin + ' €</td>' +
-                        '<td class="p-3 text-slate-500 text-[11px]">' + row.alerte_ou_deficit_reel + '</td>' +
-                    '</tr>';
+                    let phaseText = String(row.phase || "");
+                    let isPhaseUrgences = phaseText.includes("Urgences") || phaseText.includes("Phase 1");
+                    
+                    // Style dynamique selon la phase
+                    let phaseBadgeClass = isPhaseUrgences 
+                        ? "bg-amber-100 text-amber-800 border-amber-200" 
+                        : "bg-emerald-100 text-emerald-800 border-emerald-200";
+        
+                    let decouvertFinVal = parseFloat(String(row.solde_decouvert_fin || "0").replace("€", "").replace(/\s/g, "")) || 0;
+                    let statusDecouvertClass = decouvertFinVal < 0 ? "text-rose-600 font-bold" : "text-emerald-600 font-bold";
+        
+                    container.innerHTML += `
+                        <div class="bg-rose-50/20 border border-rose-100 rounded-2xl p-5 space-y-4 hover:shadow-sm transition">
+                            <!-- En-tête de la carte période -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rose-100 pb-3">
+                                <div class="flex items-center space-x-3">
+                                    <div class="bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs">
+                                        ${row.periode}
+                                    </div>
+                                    <span class="text-xs px-2.5 py-1 rounded-full border font-medium ${phaseBadgeClass}">
+                                        ${row.phase}
+                                    </span>
+                                </div>
+                                <div class="text-xs flex items-center space-x-2 bg-white px-3 py-1 rounded-xl border border-rose-50">
+                                    <span class="text-slate-400">Découvert Fin :</span>
+                                    <span class="${statusDecouvertClass}">${row.solde_decouvert_fin}</span>
+                                </div>
+                            </div>
+        
+                            <!-- Grille des flux financiers de base -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-white p-3.5 rounded-xl border border-rose-50 shadow-2xs">
+                                <div>
+                                    <span class="block text-slate-400 text-[11px]">Début de période</span>
+                                    <strong class="text-rose-600">${row.solde_decouvert_debut}</strong>
+                                </div>
+                                <div>
+                                    <span class="block text-slate-400 text-[11px]">Entrées nettes</span>
+                                    <strong class="text-slate-700">${row.entrees_nettes}</strong>
+                                </div>
+                                <div>
+                                    <span class="block text-slate-400 text-[11px]">Charges & Marge</span>
+                                    <strong class="text-slate-700">${row.charges_et_marge}</strong>
+                                </div>
+                                <div>
+                                    <span class="block text-slate-400 text-[11px]">Action Découvert</span>
+                                    <strong class="text-slate-700">${row.action_decouvert}</strong>
+                                </div>
+                            </div>
+        
+                            <!-- Affectations & Analyse / Arbitrage -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-pink-50/40 p-3 rounded-xl border border-pink-100/60 flex items-start space-x-2">
+                                    <i class="fa-solid fa-gift text-rose-500 mt-0.5"></i>
+                                    <div>
+                                        <strong class="block text-rose-700 text-[11px] mb-0.5">Affectations Cadeaux / Épargne :</strong>
+                                        <span class="text-slate-600 leading-relaxed">${row.affectations_cadeaux_epargne}</span>
+                                    </div>
+                                </div>
+                                <div class="bg-amber-50/40 p-3 rounded-xl border border-amber-100/60 flex items-start space-x-2">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5"></i>
+                                    <div>
+                                        <strong class="block text-amber-800 text-[11px] mb-0.5">Analyse & Arbitrage Réel :</strong>
+                                        <span class="text-slate-600 leading-relaxed">${row.alerte_ou_deficit_reel}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 });
+            } else {
+                container.innerHTML = '<div class="text-center text-slate-400 text-xs py-6">Aucun suivi de trésorerie disponible.</div>';
             }
         }
 
