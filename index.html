@@ -336,56 +336,45 @@
             const container = document.getElementById('evenements-grid');
             if (!container) return;
             container.innerHTML = "";
-        
+
             if (appData.evenements && appData.evenements.length > 0) {
                 let count = 0;
                 appData.evenements.forEach(function(evt) {
-                    // Recherche universelle du champ de type d'événement
-                    let rawType = "";
-                    for (let key in evt) {
-                        if (key.toLowerCase().includes("type")) {
-                            rawType = evt[key];
-                            break;
-                        }
-                    }
-                    if (!rawType) rawType = evt.type_evenement || "";
-        
+                    let rawType = evt.type_evenement || "";
                     let evtType = String(rawType).trim().toUpperCase();
                     let filterType = String(currentFilter || "").trim().toUpperCase();
-        
-                    // Filtrage tolérant et exact
+
                     if (filterType !== 'ALL') {
-                        if (filterType === 'NOEL' && !evtType.includes('NOEL')) return;
-                        if (filterType === 'ANNIVERSAIRE' && (!evtType.includes('ANNIV') && !evtType.includes('ANNIVERSAIRE'))) return;
+                        if (filterType === 'NOEL' && evtType !== 'NOEL') return;
+                        if (filterType === 'ANNIVERSAIRE' && evtType !== 'ANNIVERSAIRE') return;
                     }
-        
+
                     count++;
-        
-                    // Nettoyage et conversion monétaire
+
                     let parseAmount = function(val) {
                         if (typeof val === 'number') return val;
                         if (!val) return 0;
                         let clean = String(val).replace('€', '').replace(/\s/g, '').replace(',', '.');
                         return parseFloat(clean) || 0;
                     };
-        
-                    let budgetPrevu = parseAmount(evt.budget_cible || evt.budget);
-                    let montantProvisionne = parseAmount(evt.montant_provisionne || evt.verse);
-                    let montantDepense = parseAmount(evt.montant_depense || evt.depense);
+
+                    let budgetPrevu = parseAmount(evt.budget_cible);
+                    let montantProvisionne = parseAmount(evt.montant_provisionne);
+                    let montantDepense = parseAmount(evt.montant_depense);
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
-        
+
                     let statut = evt.statut || 'A_PROVISIONNER';
                     let badgeColor = statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-        
+
                     container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-2xs space-y-3">' +
                         '<div class="flex justify-between items-start">' +
                             '<div>' +
-                                '<span class="font-bold text-slate-800 text-sm">' + (evt.libelle || evt.personne_id || evt.evenement_id) + '</span>' +
+                                '<span class="font-bold text-slate-800 text-sm">' + (evt.libelle || evt.evenement_id) + '</span>' +
                                 '<span class="block text-[11px] text-rose-500 font-semibold"><i class="fa-regular fa-calendar mr-1"></i> ' + (evt.prochaine_date || '') + '</span>' +
                             '</div>' +
                             '<span class="text-[10px] px-2 py-0.5 rounded-full font-medium ' + badgeColor + '">' + statut + '</span>' +
                         '</div>' +
-        
+
                         '<div class="grid grid-cols-4 gap-1 text-center bg-rose-50/30 p-2 rounded-xl text-[11px]">' +
                             '<div><span class="block text-slate-400">Budget</span><strong class="text-slate-700">' + budgetPrevu.toFixed(2) + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantProvisionne.toFixed(2) + '€</strong></div>' +
@@ -394,7 +383,7 @@
                         '</div>' +
                     '</div>';
                 });
-        
+
                 if (count === 0) {
                     container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-6">Aucun événement ne correspond à ce filtre.</div>';
                 }
@@ -402,6 +391,7 @@
                 container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-6">Aucun événement disponible.</div>';
             }
         }
+
         function handleTypeChange() {
             const type = document.getElementById('mvt-type').value;
             const blockCadeau = document.getElementById('block-cadeau');
@@ -428,7 +418,7 @@
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
                     let evtType = String(evt.type_evenement || '').toUpperCase().trim();
-                    if ((cat === 'NOEL' && evtType.includes('NOEL')) || (cat === 'ANNIVERSAIRE' && evtType.includes('ANNIV'))) {
+                    if (evtType === cat) {
                         personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + (evt.libelle || evt.evenement_id) + ' (' + evt.budget_cible + ' €)</option>';
                     }
                 });
