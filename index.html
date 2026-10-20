@@ -336,18 +336,26 @@
             const container = document.getElementById('evenements-grid');
             if (!container) return;
             container.innerHTML = "";
-
+        
             if (appData.evenements && appData.evenements.length > 0) {
                 appData.evenements.forEach(function(evt) {
-                    if (currentFilter !== 'ALL' && evt.type_evenement !== currentFilter) return;
-
+                    // Normalisation pour rendre la comparaison insensible à la casse et aux accents
+                    let evtType = (evt.type_evenement || '').toString().toUpperCase().trim();
+                    let filterType = (currentFilter || '').toString().toUpperCase().trim();
+        
+                    // Gestion du filtrage
+                    if (filterType !== 'ALL') {
+                        if (filterType === 'NOEL' && !evtType.includes('NOEL')) return;
+                        if (filterType === 'ANNIVERSAIRE' && !evtType.includes('ANNIV')) return;
+                    }
+        
                     let budgetPrevu = parseFloat(evt.budget_cible) || 0;
                     let montantProvisionne = parseFloat(evt.montant_provisionne) || 0;
                     let montantDepense = parseFloat(evt.montant_depense) || 0;
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
-
+        
                     let badgeColor = evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-
+        
                     container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-2xs space-y-3">' +
                         '<div class="flex justify-between items-start">' +
                             '<div>' +
@@ -356,7 +364,7 @@
                             '</div>' +
                             '<span class="text-[10px] px-2 py-0.5 rounded-full font-medium ' + badgeColor + '">' + (evt.statut || 'A_PROVISIONNER') + '</span>' +
                         '</div>' +
-
+        
                         '<div class="grid grid-cols-4 gap-1 text-center bg-rose-50/30 p-2 rounded-xl text-[11px]">' +
                             '<div><span class="block text-slate-400">Budget</span><strong class="text-slate-700">' + budgetPrevu + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantProvisionne + '€</strong></div>' +
@@ -365,9 +373,10 @@
                         '</div>' +
                     '</div>';
                 });
+            } else {
+                container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-4">Aucun événement trouvé.</div>';
             }
         }
-
         function handleTypeChange() {
             const type = document.getElementById('mvt-type').value;
             const blockCadeau = document.getElementById('block-cadeau');
