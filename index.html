@@ -55,10 +55,8 @@
 
         <!-- VUE 1 : ÉCHÉANCIER & FLUX RÉELS -->
         <div id="view-echeancier" class="space-y-6">
-            
-            <!-- Zone dynamique des alertes issues du Sheet -->
             <div id="alertes-container" class="space-y-3">
-                <!-- Injection dynamique des alertes depuis la feuille ALERTES -->
+                <!-- Injection dynamique depuis ALERTES -->
             </div>
 
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
@@ -87,8 +85,6 @@
 
         <!-- VUE 2 : MES ENVELOPPES & PERSONNES -->
         <div id="view-planificateur" class="hidden space-y-6">
-            
-            <!-- Résumé des enveloppes virtuelles -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-4">
                 <h2 class="font-bold text-lg text-slate-800 border-b border-rose-50 pb-3">État Général des Enveloppes</h2>
                 <div id="envelopes-summary-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -96,7 +92,6 @@
                 </div>
             </section>
 
-            <!-- Événements filtrables par Proche -->
             <section class="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-rose-50 pb-4">
                     <div>
@@ -145,10 +140,10 @@
                         <input type="date" id="mvt-date" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500">
                     </div>
 
-                    <!-- BLOC CADRE CADEAU (Choix Catégorie -> Personne) -->
+                    <!-- BLOC CADRE CADEAU (Type -> Bénéficiaire initialement vide) -->
                     <div id="block-cadeau" class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Type d'événement :</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catégorie :</label>
                             <select id="cadeau-categorie" onchange="filterPersonnesByCat()" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
                                 <option value="NOEL">🎄 Noël</option>
                                 <option value="ANNIVERSAIRE">🎂 Anniversaire</option>
@@ -156,17 +151,17 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Bénéficiaire :</label>
-                            <select id="cadeau-personne" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
-                                <!-- Rempli dynamiquement -->
+                            <select id="cadeau-personne" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
+                                <option value="">-- Choisir un bénéficiaire --</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- BLOC ENVELOPPE -->
+                    <!-- BLOC ENVELOPPE (Inclusion de l'alimentation intelligente) -->
                     <div id="block-enveloppe" class="hidden sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Choisir l'enveloppe à créditer :</label>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Enveloppe à alimenter :</label>
                         <select id="enveloppe-cible" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
-                            <option value="anniversaires">👝 Anniversaires (65 €/mois)</option>
+                            <option value="anniversaires">⚡ Anniversaires (Intelligente : Priorité Deadline la plus proche)</option>
                             <option value="noel">🎄 Noël (35 €/mois)</option>
                             <option value="precaution">🛡️ Épargne de Précaution (200 €/mois)</option>
                         </select>
@@ -174,7 +169,7 @@
 
                     <div class="sm:col-span-3">
                         <label class="block text-xs font-medium text-slate-600 mb-1">Commentaire</label>
-                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou Acompte Noël">
+                        <input type="text" id="mvt-commentaire" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm focus:outline-rose-500" placeholder="Ex: Cadeau Matys ou versement paie">
                     </div>
 
                     <div>
@@ -347,7 +342,7 @@
                     if (currentFilter !== 'ALL' && evt.type_evenement !== currentFilter) return;
 
                     let budgetPrevu = parseFloat(evt.budget_cible) || 0;
-                    let montantVerse = parseFloat(evt.montant_provisionne) || 0;
+                    let montantProvisionne = parseFloat(evt.montant_provisionne) || 0;
                     let montantDepense = parseFloat(evt.montant_depense) || 0;
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
 
@@ -364,7 +359,7 @@
 
                         '<div class="grid grid-cols-4 gap-1 text-center bg-rose-50/30 p-2 rounded-xl text-[11px]">' +
                             '<div><span class="block text-slate-400">Budget</span><strong class="text-slate-700">' + budgetPrevu + '€</strong></div>' +
-                            '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantVerse + '€</strong></div>' +
+                            '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantProvisionne + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Dépensé</span><strong class="text-slate-700">' + montantDepense + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Reste</span><strong class="text-rose-600">' + resteAFinancer + '€</strong></div>' +
                         '</div>' +
@@ -394,7 +389,7 @@
             const cat = document.getElementById('cadeau-categorie').value;
             const personneSel = document.getElementById('cadeau-personne');
             if (!personneSel) return;
-            personneSel.innerHTML = "";
+            personneSel.innerHTML = '<option value="">-- Choisir un bénéficiaire --</option>';
 
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
@@ -436,6 +431,10 @@
 
             if (type === 'CADEAU_ACHETE') {
                 cibleId = document.getElementById('cadeau-personne').value;
+                if (!cibleId) {
+                    alert("Veuillez choisir un bénéficiaire dans la liste.");
+                    return;
+                }
             } else if (type === 'ALIMENTATION_ENVELOPPE') {
                 cibleId = document.getElementById('enveloppe-cible').value;
             }
