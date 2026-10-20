@@ -151,13 +151,13 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Bénéficiaire :</label>
-                            <select id="cadeau-personne" required class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
+                            <select id="cadeau-personne" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
                                 <option value="">-- Choisir un bénéficiaire --</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- BLOC ENVELOPPE (Inclusion de l'alimentation intelligente) -->
+                    <!-- BLOC ENVELOPPE -->
                     <div id="block-enveloppe" class="hidden sm:col-span-3 bg-rose-50/40 p-4 rounded-xl border border-rose-100">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Enveloppe à alimenter :</label>
                         <select id="enveloppe-cible" class="w-full border border-rose-200 rounded-xl p-2.5 text-sm bg-white">
@@ -319,8 +319,8 @@
 
             if (appData.enveloppes && appData.enveloppes.length > 0) {
                 appData.enveloppes.forEach(function(env) {
-                    let totalCible = env.budget_annuel_cible || 0;
-                    let totalVerse = env.total_verse || 0;
+                    let totalCible = parseFloat(env.budget_annuel_cible) || 0;
+                    let totalVerse = parseFloat(env.total_verse) || 0;
                     let resteAFinancer = Math.max(totalCible - totalVerse, 0);
 
                     container.innerHTML += '<div class="bg-rose-50/30 p-4 rounded-xl border border-rose-100 space-y-1">' +
@@ -336,26 +336,27 @@
             const container = document.getElementById('evenements-grid');
             if (!container) return;
             container.innerHTML = "";
-        
+
             if (appData.evenements && appData.evenements.length > 0) {
+                let count = 0;
                 appData.evenements.forEach(function(evt) {
-                    // Normalisation pour rendre la comparaison insensible à la casse et aux accents
-                    let evtType = (evt.type_evenement || '').toString().toUpperCase().trim();
-                    let filterType = (currentFilter || '').toString().toUpperCase().trim();
-        
-                    // Gestion du filtrage
+                    let evtType = String(evt.type_evenement || '').toUpperCase().trim();
+                    let filterType = String(currentFilter || '').toUpperCase().trim();
+
+                    // Filtrage insensible aux nuances de texte
                     if (filterType !== 'ALL') {
                         if (filterType === 'NOEL' && !evtType.includes('NOEL')) return;
                         if (filterType === 'ANNIVERSAIRE' && !evtType.includes('ANNIV')) return;
                     }
-        
+
+                    count++;
                     let budgetPrevu = parseFloat(evt.budget_cible) || 0;
                     let montantProvisionne = parseFloat(evt.montant_provisionne) || 0;
                     let montantDepense = parseFloat(evt.montant_depense) || 0;
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
-        
+
                     let badgeColor = evt.statut === 'ACHETE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-        
+
                     container.innerHTML += '<div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-2xs space-y-3">' +
                         '<div class="flex justify-between items-start">' +
                             '<div>' +
@@ -364,7 +365,7 @@
                             '</div>' +
                             '<span class="text-[10px] px-2 py-0.5 rounded-full font-medium ' + badgeColor + '">' + (evt.statut || 'A_PROVISIONNER') + '</span>' +
                         '</div>' +
-        
+
                         '<div class="grid grid-cols-4 gap-1 text-center bg-rose-50/30 p-2 rounded-xl text-[11px]">' +
                             '<div><span class="block text-slate-400">Budget</span><strong class="text-slate-700">' + budgetPrevu + '€</strong></div>' +
                             '<div><span class="block text-slate-400">Versé</span><strong class="text-slate-700">' + montantProvisionne + '€</strong></div>' +
@@ -373,10 +374,15 @@
                         '</div>' +
                     '</div>';
                 });
+
+                if (count === 0) {
+                    container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-6">Aucun événement ne correspond à ce filtre.</div>';
+                }
             } else {
-                container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-4">Aucun événement trouvé.</div>';
+                container.innerHTML = '<div class="col-span-2 text-center text-slate-400 text-xs py-6">Chargement des événements...</div>';
             }
         }
+
         function handleTypeChange() {
             const type = document.getElementById('mvt-type').value;
             const blockCadeau = document.getElementById('block-cadeau');
@@ -395,15 +401,16 @@
         }
 
         function filterPersonnesByCat() {
-            const cat = document.getElementById('cadeau-categorie').value;
+            const cat = String(document.getElementById('cadeau-categorie').value || '').toUpperCase().trim();
             const personneSel = document.getElementById('cadeau-personne');
             if (!personneSel) return;
             personneSel.innerHTML = '<option value="">-- Choisir un bénéficiaire --</option>';
 
             if (appData.evenements) {
                 appData.evenements.forEach(function(evt) {
-                    if (evt.type_evenement === cat) {
-                        personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + evt.libelle + ' (' + evt.budget_cible + ' €)</option>';
+                    let evtType = String(evt.type_evenement || '').toUpperCase().trim();
+                    if ((cat === 'NOEL' && evtType.includes('NOEL')) || (cat === 'ANNIVERSAIRE' && evtType.includes('ANNIV'))) {
+                        personneSel.innerHTML += '<option value="' + evt.evenement_id + '">' + (evt.libelle || evt.evenement_id) + ' (' + evt.budget_cible + ' €)</option>';
                     }
                 });
             }
@@ -415,7 +422,7 @@
             mvtTbody.innerHTML = "";
             if (appData.mouvements && appData.mouvements.length > 0) {
                 appData.mouvements.forEach(function(mvt) {
-                    let montantClass = mvt.montant > 0 ? 'text-emerald-600' : 'text-slate-800';
+                    let montantClass = parseFloat(mvt.montant) > 0 ? 'text-emerald-600' : 'text-slate-800';
                     mvtTbody.innerHTML += '<tr class="border-b border-rose-50 hover:bg-rose-50/20 transition">' +
                         '<td class="p-3.5 text-slate-500 text-xs">' + mvt.date + '</td>' +
                         '<td class="p-3.5 font-medium text-slate-700 text-xs">' + mvt.type_operation + '</td>' +
