@@ -340,22 +340,28 @@
             if (appData.evenements && appData.evenements.length > 0) {
                 let count = 0;
                 appData.evenements.forEach(function(evt) {
-                    // Extraction robuste de la valeur de type_evenement (indépendamment de la casse/espaces)
-                    let rawType = evt.type_evenement || evt.TYPE_EVENEMENT || evt["type_evenement"] || "";
+                    // Recherche universelle du champ de type d'événement
+                    let rawType = "";
+                    for (let key in evt) {
+                        if (key.toLowerCase().includes("type")) {
+                            rawType = evt[key];
+                            break;
+                        }
+                    }
+                    if (!rawType) rawType = evt.type_evenement || "";
+        
                     let evtType = String(rawType).trim().toUpperCase();
                     let filterType = String(currentFilter || "").trim().toUpperCase();
         
-                    // Filtrage exact par rapport au bouton sélectionné
-                    if (filterType === 'NOEL' && evtType !== 'NOEL') {
-                        return;
-                    }
-                    if (filterType === 'ANNIVERSAIRE' && evtType !== 'ANNIVERSAIRE') {
-                        return;
+                    // Filtrage tolérant et exact
+                    if (filterType !== 'ALL') {
+                        if (filterType === 'NOEL' && !evtType.includes('NOEL')) return;
+                        if (filterType === 'ANNIVERSAIRE' && (!evtType.includes('ANNIV') && !evtType.includes('ANNIVERSAIRE'))) return;
                     }
         
                     count++;
         
-                    // Conversion sécurisée des montants monétaires (ex: "50,00 €" ou 50)
+                    // Nettoyage et conversion monétaire
                     let parseAmount = function(val) {
                         if (typeof val === 'number') return val;
                         if (!val) return 0;
@@ -363,9 +369,9 @@
                         return parseFloat(clean) || 0;
                     };
         
-                    let budgetPrevu = parseAmount(evt.budget_cible);
-                    let montantProvisionne = parseAmount(evt.montant_provisionne);
-                    let montantDepense = parseAmount(evt.montant_depense);
+                    let budgetPrevu = parseAmount(evt.budget_cible || evt.budget);
+                    let montantProvisionne = parseAmount(evt.montant_provisionne || evt.verse);
+                    let montantDepense = parseAmount(evt.montant_depense || evt.depense);
                     let resteAFinancer = Math.max(budgetPrevu - montantDepense, 0);
         
                     let statut = evt.statut || 'A_PROVISIONNER';
